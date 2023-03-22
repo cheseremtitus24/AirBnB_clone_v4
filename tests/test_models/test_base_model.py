@@ -76,8 +76,8 @@ class test_basemodel(unittest.TestCase):
 
     def test_kwargs_one(self):
         """ """
-        n = {'Name': 'test'}
-        with self.assertRaises(KeyError):
+        n = {3: 'test'}
+        with self.assertRaises(TypeError):
             new = self.value(**n)
 
     def test_id(self):

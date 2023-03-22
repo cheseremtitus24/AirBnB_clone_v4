@@ -6,21 +6,45 @@ from datetime import datetime
 
 class BaseModel:
     """A base class for all hbnb models"""
+
     def __init__(self, *args, **kwargs):
         """Instatntiates a new model"""
-        if not kwargs:
-            from models import storage
-            self.id = str(uuid.uuid4())
-            self.created_at = datetime.now()
-            self.updated_at = datetime.now()
-            storage.new(self)
-        else:
-            kwargs['updated_at'] = datetime.strptime(kwargs['updated_at'],
-                                                     '%Y-%m-%dT%H:%M:%S.%f')
-            kwargs['created_at'] = datetime.strptime(kwargs['created_at'],
-                                                     '%Y-%m-%dT%H:%M:%S.%f')
-            del kwargs['__class__']
-            self.__dict__.update(kwargs)
+        self.id = str(uuid.uuid4())
+        if kwargs is not None:
+            for key, value in kwargs.items():
+                # Handle case when key is not a string
+                if type(key) not in [str]:
+                    raise TypeError("Key must be a String")
+
+                if "created_at" == key:
+                    self.created_at = datetime.strptime(
+                        kwargs["created_at"], "%Y-%m-%dT%H:%M:%S.%f")
+                elif "updated_at" == key:
+                    self.updated_at = datetime.strptime(
+                        kwargs["updated_at"], "%Y-%m-%dT%H:%M:%S.%f")
+                elif "__class__" == key:
+                    pass
+                else:
+                    setattr(self, key, value)
+
+            else:
+                from models import storage
+                self.created_at = datetime.now()
+                self.updated_at = datetime.now()
+                storage.new(self)
+        # if not kwargs:
+        #     from models import storage
+        #     self.id = str(uuid.uuid4())
+        #     self.created_at = datetime.now()
+        #     self.updated_at = datetime.now()
+        #     storage.new(self)
+        # else:
+        #     kwargs['updated_at'] = datetime.strptime(kwargs['updated_at'],
+        #                                              '%Y-%m-%dT%H:%M:%S.%f')
+        #     kwargs['created_at'] = datetime.strptime(kwargs['created_at'],
+        #                                              '%Y-%m-%dT%H:%M:%S.%f')
+        #     del kwargs['__class__']
+        #     self.__dict__.update(kwargs)
 
     def __str__(self):
         """Returns a string representation of the instance"""
