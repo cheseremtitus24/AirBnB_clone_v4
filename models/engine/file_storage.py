@@ -115,9 +115,14 @@ class FileStorage:
         obj [class object] - object to be deleted
         """
         if obj:
-            key = obj.to_dict()['__class__'] + '.' + obj.id
-            del(self.__objects[key])
+            # key = "{}.{}".format(type(obj).__name__, obj.id)
+            # key = obj.to_dict()['__class__'] + '.' + obj.id
+            # del(self.__objects[key])
             # del(self.all()[key])
+            obj_ref = "{}.{}".format(type(obj).__name__, obj.id)
+            all_class_objs = self.all(obj.__class__.__name__)
+            if all_class_objs.get(obj_ref):
+                del FileStorage.__objects[obj_ref]
             self.save()
         else:
             pass
