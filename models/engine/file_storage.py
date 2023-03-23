@@ -3,15 +3,34 @@
 import json
 import datetime
 
+from models.base_model import BaseModel
+from models.state import State
+from models.amenity import Amenity
+from models.city import City
+from models.user import User
+from models.place import Place
+from models.review import Review
+
 
 class FileStorage:
     """This class manages storage of hbnb models in JSON format"""
     __file_path = 'file.json'
     __objects = {}
 
-    def all(self):
+    def all(self, cls=None):
         """Returns a dictionary of models currently in storage"""
-        return FileStorage.__objects
+        if cls:
+            dictionary = dict()
+            for item in FileStorage.__objects.items():
+                if type(item[1]) in [cls]:
+                    dictionary[item[0]] = item[1]
+                    print(dictionary)
+                else:
+                    continue
+            return dictionary
+
+        else:
+            return FileStorage.__objects
 
     def new(self, obj):
         """Adds new object to storage dictionary"""
@@ -89,3 +108,15 @@ class FileStorage:
                          "text": str}
         }
         return attributes
+
+    def delete(self, obj=None):
+        """
+        Deletes Obj from __objects Global storage Dictionary
+        """
+        try:
+            key = obj.to_dict()['__class__'] + '.' + obj.id
+            del(self.__objects[key])
+            # del(self.all()[key])
+            # self.save()
+        except KeyError:
+            print("** no instance found **")
