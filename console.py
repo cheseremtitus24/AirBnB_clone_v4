@@ -288,7 +288,10 @@ class HBNBCommand(cmd.Cmd):
         # if len(print_list) > 0:
         #     print("[" + print_list[0] + "]")
         # else:
-        print(print_list)
+        print("[", end="")
+        for item in print_list:
+            print(item, end="")
+        print("]")
 
     def help_all(self):
         """ Help information for the all command """
