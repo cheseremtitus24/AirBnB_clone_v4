@@ -24,7 +24,6 @@ class FileStorage:
             for item in FileStorage.__objects.items():
                 if type(item[1]) in [cls]:
                     dictionary[item[0]] = item[1]
-                    print(dictionary)
                 else:
                     continue
             return dictionary
@@ -115,14 +114,13 @@ class FileStorage:
         obj [class object] - object to be deleted
         """
         if obj:
-            # key = "{}.{}".format(type(obj).__name__, obj.id)
-            # key = obj.to_dict()['__class__'] + '.' + obj.id
-            # del(self.__objects[key])
+
+            key = obj.to_dict()['__class__'] + '.' + obj.id
+            try:
+                del(self.__objects[key])
+                self.save()
+            except BaseException:
+                pass
             # del(self.all()[key])
-            obj_ref = "{}.{}".format(type(obj).__name__, obj.id)
-            all_class_objs = self.all(obj.__class__.__name__)
-            if all_class_objs.get(obj_ref):
-                del FileStorage.__objects[obj_ref]
-            self.save()
         else:
             pass
