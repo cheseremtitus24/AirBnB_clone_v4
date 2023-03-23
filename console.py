@@ -156,7 +156,8 @@ class HBNBCommand(cmd.Cmd):
             key, value = item.split('=')
             key = key.strip('"')
             value = value.strip('"')
-            if not value:
+            keys_list = list(storage.attributes()[class_name].keys())
+            if not value or key not in keys_list:
                 continue
             processed_value = self.__proper_value_type_converter(
                 class_name, key, value)
@@ -284,10 +285,10 @@ class HBNBCommand(cmd.Cmd):
         else:
             for k, v in storage._FileStorage__objects.items():
                 print_list.append(str(v))
-        if len(print_list) > 0:
-            print("[" + print_list[0] + "]")
-        else:
-            print(print_list)
+        # if len(print_list) > 0:
+        #     print("[" + print_list[0] + "]")
+        # else:
+        print(print_list)
 
     def help_all(self):
         """ Help information for the all command """
