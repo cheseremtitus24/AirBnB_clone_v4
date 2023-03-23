@@ -117,6 +117,6 @@ class FileStorage:
             key = obj.to_dict()['__class__'] + '.' + obj.id
             del(self.__objects[key])
             # del(self.all()[key])
-            # self.save()
+            self.save()
         except KeyError:
             print("** no instance found **")
