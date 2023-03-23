@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """ Console Module """
 import cmd
+import re
 import sys
 from models.base_model import BaseModel
 from models.__init__ import storage
@@ -19,16 +20,16 @@ class HBNBCommand(cmd.Cmd):
     prompt = '(hbnb) ' if sys.__stdin__.isatty() else ''
 
     classes = {
-               'BaseModel': BaseModel, 'User': User, 'Place': Place,
-               'State': State, 'City': City, 'Amenity': Amenity,
-               'Review': Review
-              }
+        'BaseModel': BaseModel, 'User': User, 'Place': Place,
+        'State': State, 'City': City, 'Amenity': Amenity,
+        'Review': Review
+    }
     dot_cmds = ['all', 'count', 'show', 'destroy', 'update']
     types = {
-             'number_rooms': int, 'number_bathrooms': int,
-             'max_guest': int, 'price_by_night': int,
-             'latitude': float, 'longitude': float
-            }
+        'number_rooms': int, 'number_bathrooms': int,
+        'max_guest': int, 'price_by_night': int,
+        'latitude': float, 'longitude': float
+    }
 
     def preloop(self):
         """Prints if isatty is false"""
@@ -113,19 +114,86 @@ class HBNBCommand(cmd.Cmd):
         """ Overrides the emptyline method of CMD """
         pass
 
+    def __substitute_Underscores(self, string):
+        tmp = list()
+        for char in string:
+            if "_" == char:
+                tmp.append(" ")
+            else:
+                tmp.append(char)
+        return ("".join(tmp))
+
+    def __proper_value_type_converter(self, class_name, attribute, value):
+        # value = words[3]
+        # attribute = words[2]
+        cast = None
+        if not re.search('^".*"$', value):
+            if '.' in value:
+                cast = float
+            else:
+                cast = int
+        else:
+            value = value.replace('"', '')
+        attributes = storage.attributes()[class_name]
+        if attribute in attributes:
+            value = attributes[attribute](value)
+        elif cast:
+            try:
+                value = cast(value)
+            except ValueError:
+                pass
+        return (attribute, value)
+        # setattr(storage.all()[key], attribute, value)
+        # storage.all()[key].save()
+
+    def __args_to_dict(self, args, class_name, **kwargs):
+        # Initialize an empty dictionary
+        dictionary = {}
+
+        # Loop through the array items and add each key-value pair to the
+        # dictionary
+        for item in args:
+            key, value = item.split('=')
+            key = key.strip('"')
+            value = value.strip('"')
+            processed_value = self.__proper_value_type_converter(
+                class_name, key, value)
+
+            if isinstance(processed_value[1], str):
+                value = self.__substitute_Underscores(processed_value[1])
+                dictionary[processed_value[0]] = value
+            else:
+                dictionary[processed_value[0]] = processed_value[1]
+
+        # Print the resulting dictionary
+        # print(dictionary)
+        return dictionary
+
     def do_create(self, args):
         """ Create an object of any class"""
-        if not args:
+        # arg = 'State name="california"'
+        class_name = args.split()
+        # >>> class_name
+        # ['State', 'name="california"']
+        pairs = class_name[1:]
+        # >>> pairs
+        # ['name="california"']
+        class_name = class_name[0]
+
+        if not class_name:
             print("** class name missing **")
             return
-        elif args not in HBNBCommand.classes:
+        elif class_name not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
-        n = {'Name': 'test'}
-        new_instance = HBNBCommand.classes[args](**n)
+        if pairs:
+            # convert Pairs to a dictionary.
+            pairs = self.__args_to_dict(pairs, class_name)
+            new_instance = HBNBCommand.classes[class_name](**pairs)
+        else:
+            new_instance = HBNBCommand.classes[class_name]()
         storage.save()
         print(new_instance.id)
-        storage.save()
 
     def help_create(self):
         """ Help information for the create method"""
@@ -321,6 +389,7 @@ class HBNBCommand(cmd.Cmd):
         """ Help information for the update class """
         print("Updates an object with new information")
         print("Usage: update <className> <id> <attName> <attVal>\n")
+
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()
