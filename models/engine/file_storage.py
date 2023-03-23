@@ -110,7 +110,10 @@ class FileStorage:
         return attributes
 
     def delete(self, obj=None):
-        """ Deletes Obj from __objects Global storage Dictionary """
+        """ Deletes Obj from __objects Global storage Dictionary
+        parameters:
+        obj [class object] - object to be deleted
+        """
         if obj:
             key = obj.to_dict()['__class__'] + '.' + obj.id
             del(self.__objects[key])
