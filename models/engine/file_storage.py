@@ -113,10 +113,13 @@ class FileStorage:
         """
         Deletes Obj from __objects Global storage Dictionary
         """
-        try:
-            key = obj.to_dict()['__class__'] + '.' + obj.id
-            del(self.__objects[key])
-            # del(self.all()[key])
-            self.save()
-        except KeyError:
-            print("** no instance found **")
+        if obj:
+            try:
+                key = obj.to_dict()['__class__'] + '.' + obj.id
+                del(self.__objects[key])
+                # del(self.all()[key])
+                self.save()
+            except KeyError:
+                print("** no instance found **")
+        else:
+            pass
