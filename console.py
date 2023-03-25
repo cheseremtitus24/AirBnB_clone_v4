@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 """ Console Module """
 import cmd
-import os
 import re
 import sys
 from models.base_model import BaseModel
@@ -12,7 +11,6 @@ from models.state import State
 from models.city import City
 from models.amenity import Amenity
 from models.review import Review
-STORAGE_TYPE = os.environ.get('HBNB_TYPE_STORAGE')
 
 
 class HBNBCommand(cmd.Cmd):
@@ -26,9 +24,6 @@ class HBNBCommand(cmd.Cmd):
         'State': State, 'City': City, 'Amenity': Amenity,
         'Review': Review
     }
-    if STORAGE_TYPE == "db":
-        del classes['BaseModel']
-
     dot_cmds = ['all', 'count', 'show', 'destroy', 'update']
     types = {
         'number_rooms': int, 'number_bathrooms': int,
@@ -284,11 +279,11 @@ class HBNBCommand(cmd.Cmd):
             if args not in HBNBCommand.classes:
                 print("** class doesn't exist **")
                 return
-            for k, v in storage.all(args).items():
+            for k, v in storage._FileStorage__objects.items():
                 if k.split('.')[0] == args:
                     print_list.append(str(v))
         else:
-            for k, v in storage.all().items():
+            for k, v in storage._FileStorage__objects.items():
                 print_list.append(str(v))
         # if len(print_list) > 0:
         #     print("[" + print_list[0] + "]")
