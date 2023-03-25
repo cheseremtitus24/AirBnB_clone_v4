@@ -11,7 +11,7 @@ from models.user import User
 
 if os.environ.get('HBNB_TYPE_STORAGE') == 'db':
     from models.engine import db_storage
-    CNC = db_storage.DBStorage.CNC
+    CNC = db_storage.DBStorage.classes
     storage = db_storage.DBStorage()
     storage.reload()
 else:

@@ -7,7 +7,12 @@ import os
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy.orm import sessionmaker, scoped_session
 from models.base_model import Base
-from models import base_model, amenity, city, place, review, state, user
+from models.user import User
+from models.place import Place
+from models.state import State
+from models.city import City
+from models.amenity import Amenity
+from models.review import Review
 import datetime
 
 
@@ -15,13 +20,13 @@ class DBStorage:
     """
         handles long term storage of all class instances
     """
-    CNC = {
-        'Amenity': amenity.Amenity,
-        'City': city.City,
-        'Place': place.Place,
-        'Review': review.Review,
-        'State': state.State,
-        'User': user.User
+    classes = {
+        'Amenity': Amenity,
+        'City': City,
+        'Place': Place,
+        'Review': Review,
+        'State': State,
+        'User': User
     }
 
     """
@@ -34,7 +39,7 @@ class DBStorage:
         """
             creates the engine self.__engine
         """
-        self.__engine = create_engine(
+        self.__class__.__engine = create_engine(
             'mysql+mysqldb://{}:{}@{}/{}'.format(
                 os.environ.get('HBNB_MYSQL_USER'),
                 os.environ.get('HBNB_MYSQL_PWD'),
@@ -42,7 +47,7 @@ class DBStorage:
                 os.environ.get('HBNB_MYSQL_DB')), pool_pre_ping=True)
 
         if os.environ.get("HBNB_ENV") == 'test':
-            Base.metadata.drop_all(self.__engine)
+            Base.metadata.drop_all(self.__class__.__engine)
 
     def all(self, cls=None):
         """
@@ -50,13 +55,13 @@ class DBStorage:
         """
         obj_dict = {}
         if cls is not None:
-            a_query = self.__class__.__session.query(DBStorage.CNC[cls])
+            a_query = self.__class__.__session.query(DBStorage.classes[cls])
             for obj in a_query:
                 obj_ref = "{}.{}".format(type(obj).__name__, obj.id)
                 obj_dict[obj_ref] = obj
             return obj_dict
 
-        for c in DBStorage.CNC.values():
+        for c in DBStorage.classes.values():
             a_query = self.__class__.__session.query(c)
             for obj in a_query:
                 obj_ref = "{}.{}".format(type(obj).__name__, obj.id)

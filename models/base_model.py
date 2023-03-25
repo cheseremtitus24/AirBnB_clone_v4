@@ -6,6 +6,9 @@ from datetime import datetime
 
 from sqlalchemy import Column, String, DateTime
 from sqlalchemy.ext.declarative import declarative_base
+
+import models
+
 STORAGE_TYPE = os.environ.get('HBNB_TYPE_STORAGE')
 if STORAGE_TYPE == 'db':
     Base = declarative_base()
@@ -71,4 +74,12 @@ class BaseModel:
                           (str(type(self)).split('.')[-1]).split('\'')[0]})
         dictionary['created_at'] = self.created_at.isoformat()
         dictionary['updated_at'] = self.updated_at.isoformat()
+        if dictionary['_sa_instance_state']:
+            del dictionary['_sa_instance_state']
         return dictionary
+
+    def delete(self):
+        """
+            deletes current instance from storage
+        """
+        models.storage.delete(self)
