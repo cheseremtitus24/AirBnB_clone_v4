@@ -8,7 +8,7 @@ from sqlalchemy import create_engine, MetaData
 from sqlalchemy.orm import sessionmaker, scoped_session
 from models.base_model import Base
 from models import base_model, amenity, city, place, review, state, user
-
+import datetime
 
 class DBStorage:
     """
@@ -38,7 +38,8 @@ class DBStorage:
                 os.environ.get('HBNB_MYSQL_USER'),
                 os.environ.get('HBNB_MYSQL_PWD'),
                 os.environ.get('HBNB_MYSQL_HOST'),
-                os.environ.get('HBNB_MYSQL_DB')))
+                os.environ.get('HBNB_MYSQL_DB')), pool_pre_ping=True)
+
         if os.environ.get("HBNB_ENV") == 'test':
             Base.metadata.drop_all(self.__engine)
 
@@ -48,14 +49,14 @@ class DBStorage:
         """
         obj_dict = {}
         if cls is not None:
-            a_query = self.__session.query(DBStorage.CNC[cls])
+            a_query = self.__class__.__session.query(DBStorage.CNC[cls])
             for obj in a_query:
                 obj_ref = "{}.{}".format(type(obj).__name__, obj.id)
                 obj_dict[obj_ref] = obj
             return obj_dict
 
         for c in DBStorage.CNC.values():
-            a_query = self.__session.query(c)
+            a_query = self.__class__.__session.query(c)
             for obj in a_query:
                 obj_ref = "{}.{}".format(type(obj).__name__, obj.id)
                 obj_dict[obj_ref] = obj
@@ -65,26 +66,26 @@ class DBStorage:
         """
             adds objects to current database session
         """
-        self.__session.add(obj)
+        self.__class__.__session.add(obj)
 
     def save(self):
         """
             commits all changes of current database session
         """
-        self.__session.commit()
+        self.__class__.__session.commit()
 
     def rollback_session(self):
         """
             rollsback a session in the event of an exception
         """
-        self.__session.rollback()
+        self.__class__.__session.rollback()
 
     def delete(self, obj=None):
         """
             deletes obj from current database session if not None
         """
         if obj:
-            self.__session.delete(obj)
+            self.__class__.__session.delete(obj)
             self.save()
 
     def reload(self):
@@ -92,7 +93,7 @@ class DBStorage:
            creates all tables in database & session from engine
         """
         Base.metadata.create_all(self.__engine)
-        self.__session = scoped_session(
+        self.__class__.__session = scoped_session(
             sessionmaker(
                 bind=self.__engine,
                 expire_on_commit=False))
@@ -101,7 +102,7 @@ class DBStorage:
         """
             calls remove() on private session attribute (self.session)
         """
-        self.__session.remove()
+        self.__class__.__session.remove()
 
     def get(self, cls, id):
         """
@@ -118,3 +119,43 @@ class DBStorage:
             returns the count of all objects in storage
         """
         return (len(self.all(cls)))
+
+    def attributes(self):
+        """Returns the valid attributes and their types for classname."""
+        attributes = {
+            "BaseModel":
+                     {"id": str,
+                      "created_at": datetime.datetime,
+                      "updated_at": datetime.datetime},
+            "User":
+                     {"email": str,
+                      "password": str,
+                      "first_name": str,
+                      "last_name": str
+                      },
+            "State":
+                     {"name": str},
+            "City":
+                     {"state_id": str,
+                      "name": str},
+            "Amenity":
+                     {"name": str},
+            "Place":
+                     {"city_id": str,
+                      "user_id": str,
+                      "name": str,
+                      "description": str,
+                      "number_rooms": int,
+                      "number_bathrooms": int,
+                      "max_guest": int,
+                      "price_by_night": int,
+                      "latitude": float,
+                      "longitude": float,
+                      "amenity_ids": list
+                      },
+            "Review":
+            {"place_id": str,
+                         "user_id": str,
+                         "text": str}
+        }
+        return attributes
