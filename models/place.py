@@ -61,7 +61,7 @@ class Place(BaseModel, Base):
                 getter for amenitiess list, i.e. amenities attribute of self
             """
             if len(self.amenity_ids) > 0:
-                return amenity_ids
+                return self.amenity_ids
             else:
                 return None
 
@@ -79,7 +79,7 @@ class Place(BaseModel, Base):
                 getter for reviews list, i.e. reviews attribute of self
             """
             if len(self.review_ids) > 0:
-                return review_ids
+                return self.review_ids
             else:
                 return None
 

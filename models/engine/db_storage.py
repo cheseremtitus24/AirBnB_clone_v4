@@ -10,6 +10,7 @@ from models.base_model import Base
 from models import base_model, amenity, city, place, review, state, user
 import datetime
 
+
 class DBStorage:
     """
         handles long term storage of all class instances
