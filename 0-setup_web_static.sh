@@ -29,17 +29,26 @@ chown -R ubuntu:ubuntu /data
 
 # configure nginx Aliasing
 # Resource: https://www.youtube.com/watch?v=8P2r0xSXk28
-echo -e 'server {
+echo -e ' server {
         listen 80 default_server;
         listen [::]:80 default_server;
 
-        #root /var/www/html;
-        root /data/web_static/current;
+        root /var/www/html;
 
         index index.html index.htm index.nginx-debian.html;
 
         server_name _;
-	add_header X-Served-By $hostname;
+        add_header X-Served-By $hostname;
+
+        location /current{
+                root /data/web_static/;
+        } # in above the value of location is appended to the root to be /home/tony/hello
+        #http://localhost/hello/index.html
+
+        # alias directive
+        location  /hbnb_static {
+                alias /data/web_static/current;
+        }
 
         location / {
           try_files $uri $uri/ =404;
@@ -47,9 +56,6 @@ echo -e 'server {
 
         location = /redirect_me {
           return 301 https://www.youtube.com/watch?v=QH2-TGUlwu4;
-        }
-        location = /hbnb_static {
-          alias /data/web_static/current;
         }
       }
 ' > /etc/nginx/sites-enabled/default
