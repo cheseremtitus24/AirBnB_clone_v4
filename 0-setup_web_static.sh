@@ -29,6 +29,7 @@ chown -R ubuntu:ubuntu /data
 
 # configure nginx Aliasing
 # Resource: https://www.youtube.com/watch?v=8P2r0xSXk28
+# shellcheck disable=SC2016
 echo -e ' server {
         listen 80 default_server;
         listen [::]:80 default_server;
