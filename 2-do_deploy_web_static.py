@@ -126,7 +126,7 @@ def do_post_unpack(remote_path, uploaded_file_name, file_separator):
         # filename without extension> on the web server
         file_without_extension = uploaded_file_name.split(".")[0]
         archive_dir_name = run(
-            'tar -tzf web_static_20170314233357.tgz | head -1 | cut -f1 -d"/"')
+            'tar -tzf {} | head -1 | cut -f1 -d"/"'.format(uploaded_file_name))
         archive_dir_name = str(archive_dir_name)
         # Make target Directories
         try:
