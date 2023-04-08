@@ -126,7 +126,10 @@ def do_post_unpack(remote_path, uploaded_file_name, file_separator):
         # filename without extension> on the web server
         file_without_extension = uploaded_file_name.split(".")[0]
         # Make target Directories
-        run("mkdir -p /data/web_static/releases/{}/".format(file_without_extension))
+        try:
+            run("mkdir -p /data/web_static/releases/{}/".format(file_without_extension))
+        except BaseException:
+            pass
         # Uncompress the archive to the folder
         # /data/web_static/releases/<archive
         run("tar -xzf {}{}{} -C /data/web_static/releases/{}/".format(remote_path,
