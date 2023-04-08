@@ -134,18 +134,20 @@ def do_post_unpack(remote_path, uploaded_file_name, file_separator):
         run("tar -xzf {}{}{} -C /data/web_static/releases/{}/".format(
             remote_path,
             file_separator, uploaded_file_name, file_without_extension))
-        extracted_fName = run(
-            'tar -tzf {}{}{} | head -1 | cut -f1 -d"/"'.format(
-                remote_path, file_separator, uploaded_file_name))
-        extracted_fName = str(extracted_fName)
+        # run('mv /data/web_static/releases/{}/`tar -tzf {}{}{} | head -1 | cut -f1 -d"/"` /data/web_static/releases/{}/web_static'.format(
+        #     file_without_extension,remote_path,
+        #     file_separator, uploaded_file_name, file_without_extension
+        # ))
+
+        run('mv /data/web_static/releases/{}/`tar -tzf {}{}{} | head -1 | cut -f1 -d"/"`/* /data/web_static/releases/{}/'.format(
+            file_without_extension, remote_path, file_separator, uploaded_file_name, file_without_extension))
+        run('rm -rf /data/web_static/releases/{}/`tar -tzf {}{}{} | head -1 | cut -f1 -d"/"`'.format(
+            file_without_extension, remote_path, file_separator, uploaded_file_name))
+
         # Delete the archive from the web server
         run("rm {}{}{}".format(remote_path, file_separator,
                                uploaded_file_name))
 
-        run("mv /data/web_static/releases/{}/{}/* /data/web_static/releases/{}/".format(
-            file_without_extension, extracted_fName, file_without_extension))
-        run("rm -rf /data/web_static/releases/{}/{}".format(
-            file_without_extension, extracted_fName))
         # Delete the symbolic link /data/web_static/current from the web server
         run("rm -rf /data/web_static/current")
         # Create a new the symbolic link /data/web_static/current
