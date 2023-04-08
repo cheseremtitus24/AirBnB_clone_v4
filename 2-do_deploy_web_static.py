@@ -32,38 +32,6 @@ env.password = "785b0035e30507820c46"
 
 
 @task
-def do_pack():
-    """
-       compresses web folder files and
-       versions them based on timestamp.
-  """
-    retval = None
-    try:
-        # Create the appropriate directory tree using native python.
-        result = local("mkdir -p ./versions")
-        # print("After Creating Dir result: ",type(str(result)))
-        fileName = "{}".format(datetime.now().strftime('%Y%m%d%H%M%S'))
-        result = local(
-            "tar -czvf versions/web_static_{}.tgz\
-             ./web_static".format(fileName))
-        # print("Result of Tar: ",result)
-
-        # Unix -bash implementation
-        # fileSize = local(
-        #    'stat -c "%s" versions/web_static_{}.tgz'.format(fileName))
-        fileSize = os.stat(
-            os.path.join(
-                'versions',
-                'web_static_{}.tgz'.format(fileName))).st_size
-
-        retval = "web_static packed: \
-        versions/web_static_{}.tgz -> {}Bytes".format(fileName, fileSize)
-        return retval
-    except BaseException:
-        return retval
-
-
-@task
 def do_deploy(archive_path):
     """
     deploys a web project to a remote server's
@@ -159,21 +127,26 @@ def do_post_unpack(remote_path, uploaded_file_name, file_separator):
         # filename without extension> on the web server
         file_without_extension = uploaded_file_name.split(".")[0]
         # Make target Directories
-        run("mkdir -p /data/web_static/releases/{}/".format(file_without_extension))
+        run("mkdir -p /data/web_static/releases/{}/".format(
+            file_without_extension))
         # Uncompress the archive to the folder
         # /data/web_static/releases/<archive
-        run("tar -xzf {}{}{} -C /data/web_static/releases/{}/".format(remote_path,
+        run("tar -xzf {}{}{} -C /data/web_static/releases/{}/".format(
+            remote_path,
             file_separator, uploaded_file_name, file_without_extension))
         # Delete the archive from the web server
-        run("rm {}{}{}".format(remote_path, file_separator, uploaded_file_name))
+        run("rm {}{}{}".format(remote_path, file_separator,
+                               uploaded_file_name))
 
         run("mv /data/web_static/releases/{}/web_static/* /data/web_static/releases/{}/".format(
             file_without_extension, file_without_extension))
-        run("rm -rf /data/web_static/releases/{}/web_static".format(file_without_extension))
+        run("rm -rf /data/web_static/releases/{}/web_static".format(
+            file_without_extension))
         # Delete the symbolic link /data/web_static/current from the web server
         run("rm -rf /data/web_static/current")
         # Create a new the symbolic link /data/web_static/current
-        run("ln -s /data/web_static/releases/{} /data/web_static/current".format(file_without_extension))
+        run("ln -s /data/web_static/releases/{} /data/web_static/current".format(
+            file_without_extension))
     except BaseException:
         # Error Occurred
         return False
