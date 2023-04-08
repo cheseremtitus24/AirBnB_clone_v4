@@ -13,55 +13,22 @@ import platform
 from fabric.api import task, run, env
 from fabric.operations import local, put
 
-env.hosts = [
-    # 'server.domain.tld',
-    # 'localhost',
-    '108999f0b0e4.a73c91be.alx-cod.online'
-    # 'ip.add.rr.ess
-    # 'server2.domain.tld',
-]
+# env.hosts = [
+# 'server.domain.tld',
+# 'localhost',
+# '108999f0b0e4.a73c91be.alx-cod.online'
+# 'ip.add.rr.ess
+# 'server2.domain.tld',
+# ]
 # Set the username
-env.user = "108999f0b0e4"
+# env.user = "108999f0b0e4"
 
 # Set the password [NOT RECOMMENDED]
-env.password = "785b0035e30507820c46"
+# env.password = "785b0035e30507820c46"
 
 
 # env.hosts = ['localhost']
 # env.host="108999f0b0e4.a73c91be.alx-cod.online"
-
-
-@task
-def do_pack():
-    """
-       compresses web folder files and
-       versions them based on timestamp.
-  """
-    retval = None
-    try:
-        # Create the appropriate directory tree using native python.
-        result = local("mkdir -p ./versions")
-        # print("After Creating Dir result: ",type(str(result)))
-        fileName = "{}".format(datetime.now().strftime('%Y%m%d%H%M%S'))
-        result = local(
-            "tar -czvf versions/web_static_{}.tgz\
-             ./web_static".format(fileName))
-        # print("Result of Tar: ",result)
-
-        # Unix -bash implementation
-        # fileSize = local(
-        #    'stat -c "%s" versions/web_static_{}.tgz'.format(fileName))
-        fileSize = os.stat(
-            os.path.join(
-                'versions',
-                'web_static_{}.tgz'.format(fileName))).st_size
-
-        retval = "web_static packed: \
-        versions/web_static_{}.tgz -> {}Bytes".format(fileName, fileSize)
-        return retval
-    except BaseException:
-        return retval
-
 
 @task
 def do_deploy(archive_path):
