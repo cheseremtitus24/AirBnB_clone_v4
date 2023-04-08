@@ -13,18 +13,18 @@ import platform
 from fabric.api import task, run, env
 from fabric.operations import local, put
 
-env.hosts = [
-    # 'server.domain.tld',
-    # 'localhost',
-    '108999f0b0e4.a73c91be.alx-cod.online'
-    # 'ip.add.rr.ess
-    # 'server2.domain.tld',
-]
+# env.hosts = [
+# 'server.domain.tld',
+# 'localhost',
+# '108999f0b0e4.a73c91be.alx-cod.online'
+# 'ip.add.rr.ess
+# 'server2.domain.tld',
+# ]
 # Set the username
-env.user = "108999f0b0e4"
+# env.user = "108999f0b0e4"
 
 # Set the password [NOT RECOMMENDED]
-env.password = "785b0035e30507820c46"
+# env.password = "785b0035e30507820c46"
 
 
 # env.hosts = ['localhost']
