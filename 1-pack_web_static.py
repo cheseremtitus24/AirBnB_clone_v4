@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 """
 This module makes use of fabric version 1.14.2
 and automates the creation of archive files
@@ -5,21 +6,25 @@ on a remote host
 """
 
 # Import Fabric's API module
+from datetime import datetime
+import os
+
 from fabric.api import task, run, env
+from fabric.operations import local
 
-
-env.hosts = [
-    # 'server.domain.tld',
-    # 'localhost',
-    '8c6286ded25f.7c5818d5.alx-cod.online'
-    # 'ip.add.rr.ess
-    # 'server2.domain.tld',
-]
+# env.hosts = [
+# 'server.domain.tld',
+# 'localhost',
+# '8c6286ded25f.7c5818d5.alx-cod.online'
+# 'ip.add.rr.ess
+# 'server2.domain.tld',
+# ]
 # Set the username
-env.user = "root"
+# env.user = "root"
 
 # Set the password [NOT RECOMMENDED]
-env.password = "533e04c5e8f089201105"
+# env.password = "533e04c5e8f089201105"
+# env.hosts = ['localhost']
 
 
 @task
@@ -30,22 +35,28 @@ def do_pack():
   """
     retval = None
     try:
-        result = run("mkdir -p ./versions")
+        # Create the appropriate directory tree using native python.
+        result = local("mkdir -p ./versions")
         # print("After Creating Dir result: ",type(str(result)))
-        fileName = run('date +"%Y%m%d%H%M%S"')
-        # result = run('tar -czvf versions/web_static_$(date +"%Y%m%d%H%M%S").tgz ./web_static')
-        result = run(
-            'tar -czvf versions/web_static_{}.tgz ./web_static && echo $?'.format(fileName))
+        fileName = "{}".format(datetime.now().strftime('%Y%m%d%H%M%S'))
+        result = local(
+            "tar -czvf versions/web_static_{}.tgz\
+             ./web_static".format(fileName))
         # print("Result of Tar: ",result)
-        fileSize = run(
+        fileSize = local(
             'stat -c "%s" versions/web_static_{}.tgz'.format(fileName))
-        retval = "web_static packed: versions/web_static_{}.tgz -> {}Bytes".format(
-            fileName, fileSize)
+        fileSize = os.stat(
+            os.path.join(
+                'versions',
+                'web_static_{}.tgz'.format(fileName))).st_size
+
+        retval = "web_static packed: \
+        versions/web_static_{}.tgz -> {}Bytes".format(fileName, fileSize)
         return retval
     except BaseException:
         return retval
 
-    # return None
+
 if __name__ == '__main__':
     result = do_pack()
     print(result)
