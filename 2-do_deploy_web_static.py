@@ -6,12 +6,11 @@ on a remote host
 """
 
 # Import Fabric's API module
-from datetime import datetime
-import os
 import platform
 
-from fabric.api import task, run, env
+from fabric.api import task, run
 from fabric.operations import local, put
+
 
 # env.hosts = [
 # 'server.domain.tld',
@@ -49,6 +48,7 @@ def do_deploy(archive_path):
         separator = '/'
     else:
         separator = '\\'
+
     uploaded_file_name = archive_path.split(separator)[-1]
     upload_success = upload_file_to_remote(
         file_to_upload=archive_path,
@@ -125,25 +125,35 @@ def do_post_unpack(remote_path, uploaded_file_name, file_separator):
     try:
         # filename without extension> on the web server
         file_without_extension = uploaded_file_name.split(".")[0]
+        archive_dir_name = run(
+            'tar -tzf web_static_20170314233357.tgz | head -1 | cut -f1 -d"/"')
+        archive_dir_name = str(archive_dir_name)
         # Make target Directories
         try:
-            run("mkdir -p /data/web_static/releases/{}/".format(file_without_extension))
+            # pylint: disable=E501
+            run("mkdir -p /data/{}/releases/{}/".format(archive_dir_name,
+                file_without_extension))
         except BaseException:
             pass
         # Uncompress the archive to the folder
         # /data/web_static/releases/<archive
-        run("tar -xzf {}{}{} -C /data/web_static/releases/{}/".format(remote_path,
-            file_separator, uploaded_file_name, file_without_extension))
+        run("tar -xzf {}{}{} -C /data/{}/releases/{}/".format(remote_path,
+                                                              file_separator,
+                                                              uploaded_file_name,
+                                                              archive_dir_name,
+                                                              file_without_extension))
         # Delete the archive from the web server
         run("rm {}{}{}".format(remote_path, file_separator, uploaded_file_name))
 
-        run("mv /data/web_static/releases/{}/web_static/* /data/web_static/releases/{}/".format(
-            file_without_extension, file_without_extension))
-        run("rm -rf /data/web_static/releases/{}/web_static".format(file_without_extension))
+        run("mv /data/{}/releases/{}/{}/* /data/{}/releases/{}/".format(archive_dir_name,
+            file_without_extension, archive_dir_name, archive_dir_name, file_without_extension))
+        run("rm -rf /data/{}/releases/{}/{}".format(archive_dir_name,
+                                                    file_without_extension, archive_dir_name))
         # Delete the symbolic link /data/web_static/current from the web server
-        run("rm -rf /data/web_static/current")
+        run("rm -rf /data/{}/current".format(archive_dir_name))
         # Create a new the symbolic link /data/web_static/current
-        run("ln -s /data/web_static/releases/{}/ /data/web_static/current".format(file_without_extension))
+        run("ln -s /data/{}/releases/{}/ /data/{}/current".format(archive_dir_name,
+            file_without_extension, archive_dir_name))
     except BaseException:
         # Error Occurred
         return False
