@@ -43,8 +43,10 @@ def do_pack():
             "tar -czvf versions/web_static_{}.tgz\
              ./web_static".format(fileName))
         # print("Result of Tar: ",result)
-        fileSize = local(
-            'stat -c "%s" versions/web_static_{}.tgz'.format(fileName))
+
+        # Unix -bash implementation
+        # fileSize = local(
+        #    'stat -c "%s" versions/web_static_{}.tgz'.format(fileName))
         fileSize = os.stat(
             os.path.join(
                 'versions',
