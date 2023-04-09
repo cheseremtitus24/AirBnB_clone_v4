@@ -13,12 +13,12 @@ import platform
 from fabric.api import task, run, env
 from fabric.operations import local, put
 
-env.hosts = [
+# env.hosts = [
     # '108999f0b0e4.a73c91be.alx-cod.online',
     # '54.210.108.11',
     # '54.158.179.90'
     # 'web-02.eldoret.tech',
-]
+# ]
 # Set the username
 # env.user = "108999f0b0e4"
 
