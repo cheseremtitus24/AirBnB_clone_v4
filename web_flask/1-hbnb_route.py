@@ -10,9 +10,17 @@ def create_app(test_config=None):
     when creating a flask app and must be returned
     """
     app = Flask(__name__)
+
     @app.route('/', strict_slashes=False)
-    def hello_world():
+    def hello_school():
+        """ Function returns a very basic html string without any tags"""
         return 'Hello HBNB!'
+
+    @app.route('/hbnb', strict_slashes=False)
+    def school():
+        """ Function returns a very basic html string without any tags"""
+        return 'HBNB'
+
     return app
 
 # Create the App
