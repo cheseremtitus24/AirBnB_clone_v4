@@ -2,7 +2,7 @@
 This module Utilizes basic routes and simple
 html display
 """
-from flask import Flask
+from flask import Flask, escape
 
 # Function that creates the app
 
@@ -22,6 +22,15 @@ def create_app(test_config=None):
     def school():
         """ Function returns a very basic html string without any tags"""
         return 'HBNB'
+
+    @app.route('/c/<text>', strict_slashes=False)
+    def c_func(text):
+        """ Function returns a very basic html string and displays parameter
+        values and substitutes underscores with an empty space.
+        """
+        text = text.split('_')
+        text = " ".join(text)
+        return 'C %s' % escape(text)
 
     return app
 
