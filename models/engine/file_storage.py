@@ -117,7 +117,7 @@ class FileStorage:
 
             key = obj.to_dict()['__class__'] + '.' + obj.id
             try:
-                del(self.__objects[key])
+                del (self.__objects[key])
                 self.save()
             except BaseException:
                 pass
