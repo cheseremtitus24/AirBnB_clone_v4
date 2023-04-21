@@ -7,7 +7,7 @@ from flask import Flask
 # Function that creates the app
 
 
-def create_app(test_config=None):
+def create_app(None):
     """ This is the main function that is called
     when creating a flask app and must be returned
     """
@@ -23,4 +23,4 @@ def create_app(test_config=None):
 # Create the App
 APP = create_app()
 if __name__ == '__main__':
-    APP.run(host='0.0.0.0', port=5000, debug=True)
+    APP.run(host='0.0.0.0', port=5000, debug=False)
