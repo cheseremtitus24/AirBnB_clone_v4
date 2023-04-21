@@ -7,7 +7,7 @@ files
 """
 from flask import Flask, escape, render_template
 import os
-os.environ["FLASK_APP"] = "2-c_route.py"
+os.environ["FLASK_APP"] = "6-number_odd_or_even.py"
 
 app = Flask(__name__)
 
