@@ -14,15 +14,18 @@ os.environ["FLASK_APP"] = "2-c_route.py"
 
 app = Flask(__name__)
 
+
 @app.route('/', strict_slashes=False)
 def hello_school():
     """ Function returns a very basic html string without any tags"""
     return 'Hello HBNB!'
 
+
 @app.route('/hbnb', strict_slashes=False)
 def school():
     """ Function returns a very basic html string without any tags"""
     return 'HBNB'
+
 
 @app.route('/c/<text>', strict_slashes=False)
 def c_func(text):
@@ -32,6 +35,7 @@ def c_func(text):
     text = text.split('_')
     text = " ".join(text)
     return 'C %s' % escape(text)
+
 
 @app.route('/python', strict_slashes=False)
 @app.route('/python/<text>', strict_slashes=False)
@@ -44,6 +48,7 @@ def python_func(text="is cool"):
     text = " ".join(text)
     return 'Python %s' % escape(text)
 
+
 @app.route('/number/<int:num>', strict_slashes=False)
 def int_display(num):
     """ param num:
@@ -52,6 +57,7 @@ def int_display(num):
                     Renders Integer Values only
     """
     return '%d is a number' % num
+
 
 @app.route('/number_template/<int:num>', strict_slashes=False)
 def int_display_template(num):
