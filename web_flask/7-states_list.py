@@ -80,9 +80,10 @@ def int_even_odd_display_template(num):
     """
     return render_template('6-number_odd_or_even.html', number=num)
 
+
 @app.route('/states_list', strict_slashes=False)
 def state_list():
-    """ Display Listing of all cities:
+    """ Display Listing of all States:
     """
     states = storage.all('State')
 
