@@ -4,7 +4,7 @@ Database engine
 """
 
 import os
-from sqlalchemy import create_engine, MetaData
+from sqlalchemy import create_engine, MetaData, select
 from sqlalchemy.orm import sessionmaker, scoped_session
 from models.base_model import Base
 from models.user import User
@@ -67,6 +67,18 @@ class DBStorage:
                 obj_ref = "{}.{}".format(type(obj).__name__, obj.id)
                 obj_dict[obj_ref] = obj
         return obj_dict
+
+    def state_cities(self, cls):
+        """ returns a dictionary of all Cities within a State
+        """
+        obj_dict = {}
+        if cls is not None:
+            a_query = self.__class__.__session.query(City).join(
+                State, City.state_id == State.id).filter(State.id.in_((cls,)))
+            for obj in a_query:
+                obj_ref = "{}.{}".format(type(obj).__name__, obj.id)
+                obj_dict[obj_ref] = obj
+            return obj_dict
 
     def new(self, obj):
         """
