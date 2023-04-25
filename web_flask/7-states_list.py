@@ -25,7 +25,10 @@ def state_list():
     else:
         states = storage.all(State)
 
-    return render_template('7-states_list.html', states=states)
+    return render_template(
+        '7-states_list.html',
+        states=states,
+        flag=len(states))
 
 
 @app.teardown_appcontext
