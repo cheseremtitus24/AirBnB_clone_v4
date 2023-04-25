@@ -6,6 +6,7 @@ from sqlalchemy.orm import relationship
 
 import models
 from models.base_model import BaseModel, Base
+from models.city import City
 from sqlalchemy import Column, String, ForeignKey
 STORAGE_TYPE = os.environ.get('HBNB_TYPE_STORAGE')
 
@@ -26,7 +27,7 @@ class State(BaseModel, Base):
                 linked to the current State
             """
             city_list = []
-            for city in models.storage.all("City").values():
+            for city in models.storage.all(City).values():
                 if city.state_id == self.id:
                     city_list.append(city)
             return city_list
