@@ -8,6 +8,8 @@ files
 from flask import Flask, escape, render_template
 import os
 from models import storage
+from models.state import State
+STORAGE_TYPE = os.environ.get('HBNB_TYPE_STORAGE')
 
 os.environ["FLASK_APP"] = "7-states_list.py"
 
@@ -18,7 +20,10 @@ app = Flask(__name__)
 def state_list():
     """ Display Listing of all States:
     """
-    states = storage.all('State')
+    if STORAGE_TYPE == "db":
+        states = storage.all('State')
+    else:
+        states = storage.all(State)
 
     return render_template('7-states_list.html', states=states)
 
