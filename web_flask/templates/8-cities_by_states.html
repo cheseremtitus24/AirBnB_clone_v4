@@ -4,16 +4,26 @@
         <TITLE>HBNB</TITLE>
     </HEAD>
     <BODY>
+	    {%- if city_decision > 0 %}
 	    <H1>States</H1>
-			<UL>
-				{%- for state in states| sort(attribute='name') %}
-				<LI>{{ state.id }}: <B>{{ state.name }}</B></LI>
+		<UL>
+			{%- for state in states| sort(attribute='name') %}
+			<LI>{{ state.id }}: <B>{{ state.name }}</B>
 				<UL>
 					{%- for city in storage.state_cities(state.id).values() | sort(attribute='name') %}
 					<LI>{{ city.id }}: <B>{{ city.name }}</B></LI>
-					{%- endfor %}
+					{% endfor %}
 				</UL>
-				{%- endfor %}
-			</UL>
+			</LI>
+			{% endfor %}
+		</UL>
+		{% else %}
+	    <H1>Cities</H1>
+		<UL>
+			{%- for city in states | sort(attribute='name') %}
+			<LI>City: {{ city.id }}: <B>{{ city.name }}</B></LI>
+			{% endfor %}
+		</UL>
+		{%- endif %}
     </BODY>
 </HTML>

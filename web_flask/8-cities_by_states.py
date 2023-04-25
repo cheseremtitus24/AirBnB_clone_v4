@@ -8,6 +8,8 @@ files
 from flask import Flask, escape, render_template
 import os
 from models import storage
+from models.city import City
+from models.state import State
 STORAGE_TYPE = os.environ.get('HBNB_TYPE_STORAGE')
 os.environ["FLASK_APP"] = "7-states_list.py"
 
@@ -18,9 +20,12 @@ app = Flask(__name__)
 def state_list():
     """ Display Listing of all States:
     """
-    states = storage.all('State')
-
+    if STORAGE_TYPE == "db":
+        states = storage.all('State')
+    else:
+        states = storage.all(State)
     return render_template('7-states_list.html', states=states)
+
 
 @app.route('/cities_by_states', strict_slashes=False)
 def cities_by_states():
@@ -28,16 +33,22 @@ def cities_by_states():
     when storage is db set flag to true else set to false
     When storage is other use the public getter method cities
     """
-    states = storage.all('State')
     if STORAGE_TYPE == "db":
-        flag = True
+        states = storage.all('State')
+        flag = 1
+        states = states.values()
     else:
-        flag = False
+        # obj = State()
+        # states = obj.cities
+        states = storage.all(City).values()
+        # print(states)
+        flag = 0
 
-    # cities = storage.state_cities("421a55f4-7d82-47d9-b54c-a76916479545")
-
-
-    return render_template('8-cities_by_states.html', states=states.values(), storage=storage, city_decision=flag)
+    return render_template(
+        '8-cities_by_states.html',
+        states=states,
+        storage=storage,
+        city_decision=flag)
 
 
 @app.teardown_appcontext
