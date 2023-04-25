@@ -21,7 +21,6 @@ from fabric.operations import local, put
 # ]
 # Set the username
 # env.user = "108999f0b0e4"
-
 # Set the password [NOT RECOMMENDED]
 # env.password = "785b0035e30507820c46"
 
