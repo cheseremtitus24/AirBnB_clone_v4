@@ -2,7 +2,7 @@
 """ Module for testing file storage"""
 import unittest
 from models.base_model import BaseModel
-from models import storage
+from models import storage, State, City
 import os
 
 
@@ -113,5 +113,54 @@ class test_fileStorage(unittest.TestCase):
     def test_storage_var_created(self):
         """ FileStorage object storage created """
         from models.engine.file_storage import FileStorage
-        #print(type(storage))
+        # print(type(storage))
         self.assertEqual(type(storage), FileStorage)
+
+    def test_get_obj_by_id(self):
+        """
+        Tests the FileStorage.get() function to verify that it
+        returns the expected object specified by id
+        :return:
+        """
+        new = BaseModel()
+        new2 = BaseModel()
+        new.save()
+        new2.save()
+        storage.reload()
+        b_model = storage.get(BaseModel, new.id)
+        # Test should return None if ID not exist
+        b_model_none_exist = storage.get(BaseModel, "Not Exists ID")
+        b_model_c_id_none_exist = storage.get("Bogus", "Not Exists ID")
+        # print(b_model.__dict__['id'])
+        self.assertEqual(b_model.__dict__['id'], new.id)
+        self.assertNotEqual(b_model.__dict__['id'], new2.id)
+        self.assertNotEqual(b_model.__dict__['id'], new2.id)
+        self.assertEqual(b_model_none_exist, None)
+        self.assertEqual(b_model_c_id_none_exist, None)
+
+    def test_count_objects(self):
+        """ Tests the Number of objects in file storage as well as
+        the number of class instances available
+        """
+        new = BaseModel()
+        new2 = BaseModel()
+        new3 = State()
+        new4 = City()
+        new.save()
+        new3.save()
+        new4.save()
+        new2.save()
+        storage.reload()
+        all_models = storage.count()
+        all_b_models = storage.count(BaseModel)
+        self.assertEqual(all_models, 4)
+        self.assertEqual(all_b_models, 2)
+
+
+if __name__ == '__main__':
+    suite_loader = unittest.TestLoader()
+    test = test_fileStorage()
+    suite1 = suite_loader.loadTestsFromTestCase(test)
+    suite = unittest.TestSuite([suite1])
+    unittest.TextTestRunner(verbosity=3).run(suite)
+    # unittest.main(test_fileStorage,verbosity=5)

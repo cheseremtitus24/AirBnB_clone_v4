@@ -72,39 +72,39 @@ class FileStorage:
         """Returns the valid attributes and their types for classname."""
         attributes = {
             "BaseModel":
-                     {"id": str,
-                      "created_at": datetime.datetime,
-                      "updated_at": datetime.datetime},
+                {"id": str,
+                 "created_at": datetime.datetime,
+                 "updated_at": datetime.datetime},
             "User":
-                     {"email": str,
-                      "password": str,
-                      "first_name": str,
-                      "last_name": str
-                      },
+                {"email": str,
+                 "password": str,
+                 "first_name": str,
+                 "last_name": str
+                 },
             "State":
-                     {"name": str},
+                {"name": str},
             "City":
-                     {"state_id": str,
-                      "name": str},
+                {"state_id": str,
+                 "name": str},
             "Amenity":
-                     {"name": str},
+                {"name": str},
             "Place":
-                     {"city_id": str,
-                      "user_id": str,
-                      "name": str,
-                      "description": str,
-                      "number_rooms": int,
-                      "number_bathrooms": int,
-                      "max_guest": int,
-                      "price_by_night": int,
-                      "latitude": float,
-                      "longitude": float,
-                      "amenity_ids": list
-                      },
+                {"city_id": str,
+                 "user_id": str,
+                 "name": str,
+                 "description": str,
+                 "number_rooms": int,
+                 "number_bathrooms": int,
+                 "max_guest": int,
+                 "price_by_night": int,
+                 "latitude": float,
+                 "longitude": float,
+                 "amenity_ids": list
+                 },
             "Review":
-            {"place_id": str,
-                         "user_id": str,
-                         "text": str}
+                {"place_id": str,
+                 "user_id": str,
+                 "text": str}
         }
         return attributes
 
@@ -130,3 +130,36 @@ class FileStorage:
             calls the reload() method for deserialization from JSON to objects
         """
         self.reload()
+
+    def get(self, cls, id):
+        """Returns a dictionary of models currently in storage"""
+        if cls:
+            for item in FileStorage.__objects.items():
+                if type(item[1]) in [cls]:
+                    key = str(cls.__name__) + '.' + id
+                    # print(key)
+                    return self.__objects.get(key, None)
+                    break
+                else:
+                    continue
+            return None
+
+        else:
+            return FileStorage.__objects
+
+    def count(self, cls=None):
+        """
+        :param cls:  Defines the Class to which its instance objects to count
+        :return: a +ve integer value else zero
+        """
+        count = 0
+        if cls:
+            for item in FileStorage.__objects.items():
+                if type(item[1]) in [cls]:
+                    count += 1
+                else:
+                    continue
+            return count
+
+        else:
+            return len(FileStorage.__objects)
