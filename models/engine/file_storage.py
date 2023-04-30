@@ -112,6 +112,7 @@ class FileStorage:
         """ Deletes Obj from __objects Global storage Dictionary
         parameters:
         obj [class object] - object to be deleted
+        returns: true on success else false
         """
         if obj:
 
@@ -119,10 +120,13 @@ class FileStorage:
             try:
                 del (self.__objects[key])
                 self.save()
+                return True
             except BaseException:
+                return False
                 pass
             # del(self.all()[key])
         else:
+            return True
             pass
 
     def close(self):
@@ -131,7 +135,7 @@ class FileStorage:
         """
         self.reload()
 
-    def get(self, cls, id):
+    def get(self, cls=None, id=None):
         """Returns a dictionary of models currently in storage"""
         if cls:
             for item in FileStorage.__objects.items():

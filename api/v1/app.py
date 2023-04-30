@@ -5,10 +5,11 @@ html display and utilizes render_template
 which allows rendering of external reference html
 files
 """
-from flask import Flask, escape, render_template
+from flask import Flask, escape, make_response, render_template, jsonify
 import os
 
 from api.v1.views import app_views
+from api.v1.views import states
 from models import storage
 from models.state import State
 from models.city import City
@@ -126,6 +127,16 @@ def shutdown_session(exception=None):
     completed get request
     """
     storage.close()
+
+
+@app.errorhandler(404)
+def not_found(error):
+    """
+    overrides the default 404 not found error
+    :param error:
+    :return:
+    """
+    return make_response(jsonify({'error': 'Not found'}), 404)
 
 
 if __name__ == '__main__':

@@ -105,6 +105,8 @@ class DBStorage:
         if obj:
             self.__class__.__session.delete(obj)
             self.save()
+            return True
+        return False
 
     def reload(self):
         """
@@ -122,7 +124,7 @@ class DBStorage:
         """
         self.__class__.__session.close()
 
-    def get(self, cls, id):
+    def get(self, cls=None, id=None):
         """
             retrieves one object based on class name and id
         """
