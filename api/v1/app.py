@@ -9,8 +9,9 @@ from flask import Flask, escape, make_response, render_template, jsonify
 import os
 
 from api.v1.views import app_views
-from api.v1.views import states
-from api.v1.views import index
+# from api.v1.views import states
+# from api.v1.views import index
+import api.v1.views
 from models import storage
 from models.state import State
 from models.city import City

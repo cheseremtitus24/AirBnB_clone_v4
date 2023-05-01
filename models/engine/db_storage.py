@@ -68,13 +68,17 @@ class DBStorage:
                 obj_dict[obj_ref] = obj
         return obj_dict
 
-    def state_cities(self, cls):
-        """ returns a dictionary of all Cities within a State
+    def state_cities(self, state_id):
+        """
+        cls is the state id to be searched for
+        returns a dictionary of all Cities within a State
         """
         obj_dict = {}
-        if cls is not None:
+        if state_id is not None:
             a_query = self.__class__.__session.query(City).join(
-                State, City.state_id == State.id).filter(State.id.in_((cls,)))
+                State, City.state_id == State.id).filter(
+                State.id.in_(
+                    (state_id,)))
             for obj in a_query:
                 obj_ref = "{}.{}".format(type(obj).__name__, obj.id)
                 obj_dict[obj_ref] = obj
