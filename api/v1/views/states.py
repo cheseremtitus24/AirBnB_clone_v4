@@ -12,11 +12,10 @@ app.register_blueprint(app_views)
 You can also override its url_prefix like so
 app.register_blueprint(app_views, url_prefix="/diff/url")
 """
-from flask import jsonify, Blueprint, abort, render_template
+from flask import jsonify, escape, Blueprint, abort, render_template
 from jinja2 import TemplateNotFound
 import os
 
-from markupsafe import escape
 
 from api.v1.views import app_views
 from models import BaseModel, storage, Amenity, City, Review, State, User, Place
