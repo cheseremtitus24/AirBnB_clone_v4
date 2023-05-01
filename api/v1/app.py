@@ -24,12 +24,13 @@ os.environ["FLASK_APP"] = "app.py"
 app = Flask(__name__)
 
 """
- You can customize how the Flask Blueprint extends the application by providing some parameters to register_blueprint:
- 
+ You can customize how the Flask Blueprint extends
+  the application by providing some parameters to register_blueprint:
+
  ->[url_prefix] is an optional prefix for all the Blueprint’s routes.
  ->[subdomain] is a subdomain that Blueprint routes will match.
  ->[url_defaults] is a dictionary with default values for view arguments.
- 
+
  """
 app.register_blueprint(app_views)
 
@@ -86,7 +87,6 @@ def get_states(text="all"):
     else:
         if STORAGE_TYPE == "db":
             states = storage.all('State')
-            # cities = storage.state_cities("421a55f4-7d82-47d9-b54c-a76916479545")
             dummy = list()
             for state in states.values():
                 if state.id == text:
