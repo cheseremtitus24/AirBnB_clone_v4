@@ -186,6 +186,7 @@ class FileStorage:
                     except BaseException:
                         return None
             self.save()
+            self.reload()
             return self.__class__.__objects[pkey]
         else:
 
