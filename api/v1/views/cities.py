@@ -42,8 +42,13 @@ def get_cities(state_id):
             cities = storage.state_cities(state_id).values()
         else:
             cities = storage.all(City).values()
+            dummy = list()
 
-            # print(cities)
+            for value in cities:
+                # print(" --------", value)
+                if getattr(value, 'state_id', None) == state_id:
+                    dummy.append(value)
+            cities = dummy
 
         for val in cities:
             temp.append(val.to_dict())
@@ -53,7 +58,7 @@ def get_cities(state_id):
             return jsonify(temp)
 
 
-@app_views.route('cities/<city_id>', strict_slashes=False)
+@app_views.route('/cities/<city_id>', strict_slashes=False)
 def get_city(city_id):
     """ Function returns list of cities by states and
     displays/renders them in a html document.
@@ -141,7 +146,7 @@ def post_city(state_id):
     return jsonify(new_object.to_dict()), 201
 
 
-@app_views.route('/cities/<city_id>',
+@app_views.route('/cities/<string:city_id>',
                  strict_slashes=False, methods=['PUT'])
 def update_city(city_id):
     """ Updates a city's values
