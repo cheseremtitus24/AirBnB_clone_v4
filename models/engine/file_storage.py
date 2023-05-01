@@ -167,3 +167,27 @@ class FileStorage:
 
         else:
             return len(FileStorage.__objects)
+
+    def update(self, obj, idd, req_json):
+        """
+        :param obj: updates
+        :return:
+        """
+        if obj:
+
+            pkey = "{}.{}".format(obj.__name__, idd)
+            if getattr(self.__objects, pkey, None):
+                for key, value in req_json.items():
+                    if key not in [
+                        "__class__",
+                        "created_at",
+                        "id",
+                            "updated_at"]:
+                        setattr(self.__objects[pkey], key, value)
+                self.save()
+                return self.__objects[pkey]
+            else:
+                return None
+        else:
+
+            return None

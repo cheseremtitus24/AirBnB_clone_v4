@@ -144,38 +144,64 @@ class DBStorage:
         """Returns the valid attributes and their types for classname."""
         attributes = {
             "BaseModel":
-                     {"id": str,
-                      "created_at": datetime.datetime,
-                      "updated_at": datetime.datetime},
+                {"id": str,
+                 "created_at": datetime.datetime,
+                 "updated_at": datetime.datetime},
             "User":
-                     {"email": str,
-                      "password": str,
-                      "first_name": str,
-                      "last_name": str
-                      },
+                {"email": str,
+                 "password": str,
+                 "first_name": str,
+                 "last_name": str
+                 },
             "State":
-                     {"name": str},
+                {"name": str},
             "City":
-                     {"state_id": str,
-                      "name": str},
+                {"state_id": str,
+                 "name": str},
             "Amenity":
-                     {"name": str},
+                {"name": str},
             "Place":
-                     {"city_id": str,
-                      "user_id": str,
-                      "name": str,
-                      "description": str,
-                      "number_rooms": int,
-                      "number_bathrooms": int,
-                      "max_guest": int,
-                      "price_by_night": int,
-                      "latitude": float,
-                      "longitude": float,
-                      "amenity_ids": list
-                      },
+                {"city_id": str,
+                 "user_id": str,
+                 "name": str,
+                 "description": str,
+                 "number_rooms": int,
+                 "number_bathrooms": int,
+                 "max_guest": int,
+                 "price_by_night": int,
+                 "latitude": float,
+                 "longitude": float,
+                 "amenity_ids": list
+                 },
             "Review":
-            {"place_id": str,
-                         "user_id": str,
-                         "text": str}
+                {"place_id": str,
+                 "user_id": str,
+                 "text": str}
         }
         return attributes
+
+    def update(self, obj, idd, req_json):
+        """
+        :param obj: updates
+        :return:
+        """
+        if obj:
+            # update row to database
+            row = self.__session.query(obj).filter_by(id=idd).first()
+            # print("Result of no row results is ",row)
+            if row:
+                # print('original:', row.id, row.name)
+                for key, value in req_json.items():
+                    if key not in [
+                        "__class__",
+                        "created_at",
+                        "id",
+                            "updated_at"]:
+                        setattr(row, key, value)
+                self.save()
+                return row
+            else:
+                return None
+        else:
+
+            return None
