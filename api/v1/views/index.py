@@ -18,7 +18,7 @@ from models import storage, Amenity, City, Review, State, User, Place
 app_views = Blueprint('app_views', __name__, url_prefix="/api/v1")
 
 
-@app_views.route('/status', strict_slashes=False)
+@app_views.route('/status', strict_slashes=False, methods=['GET'])
 def status():
     """ Function returns a very basic html string
     that reports a status of ok"""

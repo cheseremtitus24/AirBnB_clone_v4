@@ -18,10 +18,10 @@ import os
 
 from markupsafe import escape
 
+from api.v1.views import app_views
 from models import BaseModel, storage, Amenity, City, Review, State, User, Place
 
 STORAGE_TYPE = os.environ.get('HBNB_TYPE_STORAGE')
-app_views = Blueprint('app_views', __name__, url_prefix="/api/v1")
 
 
 @app_views.route('/states', strict_slashes=False)

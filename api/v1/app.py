@@ -10,6 +10,7 @@ import os
 
 from api.v1.views import app_views
 from api.v1.views import states
+from api.v1.views import index
 from models import storage
 from models.state import State
 from models.city import City
