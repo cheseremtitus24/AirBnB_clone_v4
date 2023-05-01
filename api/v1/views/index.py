@@ -12,12 +12,14 @@ app.register_blueprint(app_views)
 You can also override its url_prefix like so
 app.register_blueprint(app_views, url_prefix="/diff/url")
 """
+import os
+
 from flask import jsonify, Blueprint
 
 from models import storage, Amenity, City, Review, State, User, Place
 
 app_views = Blueprint('app_views', __name__, url_prefix="/api/v1")
-
+STORAGE_TYPE = os.environ.get('HBNB_TYPE_STORAGE')
 
 @app_views.route('/status', strict_slashes=False, methods=['GET'])
 def status():
@@ -32,12 +34,22 @@ def stats():
     Function stats - returns the objects count
     of model classes in storage
     """
-    stats = {
-        "amenities": storage.count(Amenity),
-        "cities": storage.count(City),
-        "places": storage.count(Place),
-        "reviews": storage.count(Review),
-        "states": storage.count(State),
-        "users": storage.count(User)
-    }
+    if STORAGE_TYPE == "db":
+        stats = {
+            "amenities": storage.count("Amenity"),
+            "cities": storage.count("City"),
+            "places": storage.count("Place"),
+            "reviews": storage.count("Review"),
+            "states": storage.count("State"),
+            "users": storage.count("User")
+        }
+    else:
+        stats = {
+            "amenities": storage.count(Amenity),
+            "cities": storage.count(City),
+            "places": storage.count(Place),
+            "reviews": storage.count(Review),
+            "states": storage.count(State),
+            "users": storage.count(User)
+        }
     return jsonify(stats)
