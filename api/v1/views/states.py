@@ -19,7 +19,8 @@ import os
 
 
 from api.v1.views import app_views
-from models import BaseModel, storage, Amenity, City, Review, State, User, Place
+from models import BaseModel, storage,\
+    Amenity, City, Review, State, User, Place
 
 STORAGE_TYPE = os.environ.get('HBNB_TYPE_STORAGE')
 
@@ -48,7 +49,6 @@ def get_states(text="all"):
     else:
         if STORAGE_TYPE == "db":
             states = storage.all('State')
-            # cities = storage.state_cities("421a55f4-7d82-47d9-b54c-a76916479545")
             dummy = list()
             for state in states.values():
                 if state.id == text:
@@ -91,7 +91,9 @@ def get_states(text="all"):
         #     city_decision=0)
 
 
-@app_views.route('/states/<string:text>', strict_slashes=False, methods=['DELETE'])
+@app_views.route('/states/<string:text>',
+                 strict_slashes=False,
+                 methods=['DELETE'])
 def del_states(text):
     """ Function returns list of cities by states and
     displays/renders them in a html document.
@@ -117,6 +119,7 @@ def del_states(text):
                 abort(404)
         else:
             abort(404)
+
 
 @app_views.route('/states', strict_slashes=False, methods=['POST'])
 def post_states():
