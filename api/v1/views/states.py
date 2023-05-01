@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 # noinspection PyInterpreter,PyInterpreter
 """
 This is a module that implements a blueprint
@@ -116,3 +117,23 @@ def del_states(text):
                 abort(404)
         else:
             abort(404)
+
+@app_views.route('/states', strict_slashes=False, methods=['POST'])
+def post_states():
+    """ Function returns list of cities by states and
+    displays/renders them in a html document.
+    when no get parameter is provided it will list all available
+    states.
+    When a state_id is provided it will list all cities within than state
+    When a non_existent state_id is provided (url/states/<invalid_state_id>
+    the page displays "Not found!"
+    """
+    if request.method == 'POST':
+        req_json = request.get_json()
+        if req_json is None:
+            abort(400, 'Not a JSON')
+        if req_json.get("name") is None:
+            abort(400, 'Missing name')
+        new_object = State(**req_json)
+        new_object.save()
+        return jsonify(new_object.to_json()), 201
