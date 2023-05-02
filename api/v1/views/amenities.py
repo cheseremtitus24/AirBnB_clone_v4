@@ -19,37 +19,29 @@ from flask import jsonify, escape, abort, request
 
 from api.v1.views import app_views
 from models import storage, \
-    City, State
+    City, State, Amenity
 
 STORAGE_TYPE = os.environ.get('HBNB_TYPE_STORAGE')
 
 
-@app_views.route('/states/<string:state_id>/cities', strict_slashes=False)
-def get_cities(state_id):
-    """ Function returns list of cities by states and
-    displays/renders them in a html document.
-    when no get parameter is provided it will list all available
-    states.
-    When a state_id is provided it will list all cities within than state
-    When a non_existent state_id is provided (url/states/<invalid_state_id>
-    the page displays "Not found!"
+@app_views.route('/amenities', strict_slashes=False)
+def get_amenities():
+    """ Function returns list of amenities in json format
     """
     temp = list()
 
     if True:
         if STORAGE_TYPE == "db":
-            cities = storage.state_cities(state_id).values()
+            amenities = storage.all('Amenity').values()
         else:
-            cities = storage.all(City).values()
+            amenities = storage.all(Amenity).values()
             dummy = list()
 
-            for value in cities:
-                # print(" --------", value)
-                if getattr(value, 'state_id', None) == state_id:
-                    dummy.append(value)
-            cities = dummy
+            for value in amenities:
+                dummy.append(value)
+            amenities = dummy
 
-        for val in cities:
+        for val in amenities:
             temp.append(val.to_dict())
         if len(temp) < 1:
             abort(404)
@@ -57,8 +49,8 @@ def get_cities(state_id):
             return jsonify(temp)
 
 
-@app_views.route('/cities/<city_id>', strict_slashes=False)
-def get_city(city_id):
+@app_views.route('/amenities/<amenity_id>', strict_slashes=False)
+def get_amenity(amenity_id):
     """ Function returns list of cities by states and
     displays/renders them in a html document.
     when no get parameter is provided it will list all available
@@ -71,14 +63,14 @@ def get_city(city_id):
 
     if True:
         if STORAGE_TYPE == "db":
-            cities = storage.all("City").values()
+            cities = storage.all("Amenity").values()
         else:
-            cities = storage.all(City).values()
+            cities = storage.all(Amenity).values()
 
             # print(cities)
 
         for val in cities:
-            if val.id == city_id:
+            if val.id == amenity_id:
                 temp.append(val.to_dict())
                 break
         if len(temp) < 1:
@@ -87,10 +79,10 @@ def get_city(city_id):
             return jsonify(temp)
 
 
-@app_views.route('/cities/<city_id>',
+@app_views.route('/amenities/<amenity_id>',
                  strict_slashes=False,
                  methods=['DELETE'])
-def del_city(city_id):
+def del_amenity(amenity_id):
     """ Function returns list of cities by states and
     displays/renders them in a html document.
     when no get parameter is provided it will list all available
@@ -99,13 +91,13 @@ def del_city(city_id):
     When a non_existent state_id is provided (url/states/<invalid_state_id>
     the page displays "Not found!"
     """
-    if city_id:
+    if amenity_id:
         if STORAGE_TYPE == "db":
-            del_obj = storage.get("City", escape(city_id))
+            del_obj = storage.get("Amenity", escape(amenity_id))
         else:
             # Handles File Storage
             # storage.get return an object dictionary else None
-            del_obj = storage.get(City, escape(city_id))
+            del_obj = storage.get(Amenity, escape(amenity_id))
         if del_obj:
             # storage.delete returns true on success else false
             del_status = storage.delete(del_obj)
@@ -117,37 +109,28 @@ def del_city(city_id):
             abort(404)
 
 
-@app_views.route('/states/<state_id>/cities',
+@app_views.route('/amenities',
                  strict_slashes=False, methods=['POST'])
-def post_city(state_id):
+def post_amenities():
     """ Creates a new State and initializes it with a state name
     if requested dictionary is none output 'Not a JSON'
     if post data does not contain the key 'name' output 'Missing name'
     On success return a status of 201 else 400
     """
-    if STORAGE_TYPE == "db":
-        state_obj = storage.get("State", escape(state_id))
-    else:
-        # Handles File Storage
-        # storage.get return an object dictionary else None
-        state_obj = storage.get(State, escape(state_id))
-    if state_obj is None:
-        abort(404, 'Not found')
 
     req_json = request.get_json()
     if req_json is None:
         abort(400, 'Not a JSON')
     if req_json.get("name") is None:
         abort(400, 'Missing name')
-    req_json["state_id"] = state_id
-    new_object = City(**req_json)
+    new_object = Amenity(**req_json)
     new_object.save()
     return jsonify(new_object.to_dict()), 201
 
 
-@app_views.route('/cities/<string:city_id>',
+@app_views.route('/amenities/<amenity_id>',
                  strict_slashes=False, methods=['PUT'])
-def update_city(city_id):
+def update_amenity(amenity_id):
     """ Updates a city's values
     if requested dictionary is none output 'Not a JSON'
     if post data does not contain the key 'name' output 'Missing name'
@@ -158,7 +141,7 @@ def update_city(city_id):
         abort(400, 'Not a JSON')
     if req_json.get("name") is None:
         abort(400, 'Missing name')
-    status = storage.update(City, city_id, req_json)
+    status = storage.update(Amenity, amenity_id, req_json)
 
     if status:
         return jsonify(status.to_dict())

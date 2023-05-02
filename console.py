@@ -137,6 +137,7 @@ class HBNBCommand(cmd.Cmd):
             else:
                 cast = int
         else:
+            value = value.replace(' ', '_')
             value = value.replace('"', '')
         attributes = storage.attributes()[class_name]
         if attribute in attributes:
@@ -147,8 +148,6 @@ class HBNBCommand(cmd.Cmd):
             except ValueError:
                 pass
         return (attribute, value)
-        # setattr(storage.all()[key], attribute, value)
-        # storage.all()[key].save()
 
     def __args_to_dict(self, args, class_name, **kwargs):
         # Initialize an empty dictionary
@@ -156,7 +155,11 @@ class HBNBCommand(cmd.Cmd):
 
         # Loop through the array items and add each key-value pair to the
         # dictionary
-        for item in args:
+        dummy = list()
+        args = " ".join(args)
+        dummy.append(args)
+        for item in dummy:
+            print(item)
             key, value = item.split('=')
             key = key.strip('"')
             value = value.strip('"')
@@ -172,8 +175,6 @@ class HBNBCommand(cmd.Cmd):
             else:
                 dictionary[processed_value[0]] = processed_value[1]
 
-        # Print the resulting dictionary
-        # print(dictionary)
         return dictionary
 
     def do_create(self, args):
@@ -264,7 +265,7 @@ class HBNBCommand(cmd.Cmd):
         key = c_name + "." + c_id
 
         try:
-            del(storage.all()[key])
+            del (storage.all()[key])
             storage.save()
         except KeyError:
             print("** no instance found **")
