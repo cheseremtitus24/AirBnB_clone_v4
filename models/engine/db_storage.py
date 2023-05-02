@@ -184,11 +184,13 @@ class DBStorage:
         }
         return attributes
 
-    def update(self, obj, idd, req_json):
+    def update(self, obj, idd, req_json, ignore_fields=[]):
         """
         :param obj: updates
         :return:
         """
+        default_list_ignore = ["__class__", "created_at", "id", "updated_at"]
+        default_list_ignore += ignore_fields
         if obj:
             # update row to database
             row = self.__session.query(obj).filter_by(id=idd).first()
@@ -196,11 +198,7 @@ class DBStorage:
             if row:
                 # print('original:', row.id, row.name)
                 for key, value in req_json.items():
-                    if key not in [
-                        "__class__",
-                        "created_at",
-                        "id",
-                            "updated_at"]:
+                    if key not in default_list_ignore:
                         setattr(row, key, value)
                 self.save()
                 return row

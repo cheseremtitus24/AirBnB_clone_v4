@@ -19,14 +19,38 @@ from flask import jsonify, escape, abort, request
 
 from api.v1.views import app_views
 from models import storage, \
-    State
+    User
 
 STORAGE_TYPE = os.environ.get('HBNB_TYPE_STORAGE')
 
 
-@app_views.route('/states', strict_slashes=False)
-@app_views.route('/states/<text>', strict_slashes=False)
-def get_states(text="all"):
+@app_views.route('/users', strict_slashes=False)
+def get_users():
+    """ Function returns list of amenities in json format
+    """
+    temp = list()
+
+    if True:
+        if STORAGE_TYPE == "db":
+            users = storage.all('User').values()
+        else:
+            users = storage.all(User).values()
+            dummy = list()
+
+            for value in users:
+                dummy.append(value)
+            users = dummy
+
+        for val in users:
+            temp.append(val.to_dict())
+        if len(temp) < 1:
+            abort(404)
+        else:
+            return jsonify(temp)
+
+
+@app_views.route('/users/<user_id>', strict_slashes=False)
+def get_user(user_id):
     """ Function returns list of cities by states and
     displays/renders them in a html document.
     when no get parameter is provided it will list all available
@@ -36,64 +60,29 @@ def get_states(text="all"):
     the page displays "Not found!"
     """
     temp = list()
-    if text == "all":
+
+    if True:
         if STORAGE_TYPE == "db":
-            states = storage.all('State')
+            user = storage.all("Users").values()
         else:
-            states = storage.all(State)
-        for key, val in states.items():
-            temp.append(val.to_dict())
-        # return render_template('7-states_list.html', states=states)
-        return jsonify(temp)
-    else:
-        if STORAGE_TYPE == "db":
-            states = storage.all('State')
-            dummy = list()
-            for state in states.values():
-                if state.id == text:
-                    states = state
-                    dummy.append(states)
-            # for key, val in dummy[0]:
-            #     temp.append(val.to_dict())
-            if len(dummy) < 1:
-                abort(404)
-            else:
-                return jsonify(dummy[0].to_dict())
-            """
-            return render_template(
-                '9-states.html',
-                states=dummy,
-                storage=storage,
-                condition=len(dummy))
-                """
+            user = storage.all(User).values()
+
+            # print(cities)
+
+        for val in user:
+            if val.id == user_id:
+                temp.append(val.to_dict())
+                break
+        if len(temp) < 1:
+            abort(404)
         else:
-            states = storage.all(State)
-            dummy = list()
-            for state in states.values():
-                if state.id == text:
-                    states = state
-                    dummy.append(states)
-            # for key, val in dummy[0]:
-            #     temp.append(val.to_dict())
-            if len(dummy) < 1:
-                abort(404)
-            else:
-                return jsonify(dummy[0].to_dict())
-
-        # states = storage.all(City).values()
-        #     return jsonify(states.to_dict())
-
-        # return render_template(
-        #     '8-cities_by_states.html',
-        #     states=states,
-        #     storage=storage,
-        #     city_decision=0)
+            return jsonify(temp)
 
 
-@app_views.route('/states/<string:text>',
+@app_views.route('/users/<user_id>',
                  strict_slashes=False,
                  methods=['DELETE'])
-def del_states(text):
+def del_user(user_id):
     """ Function returns list of cities by states and
     displays/renders them in a html document.
     when no get parameter is provided it will list all available
@@ -102,13 +91,13 @@ def del_states(text):
     When a non_existent state_id is provided (url/states/<invalid_state_id>
     the page displays "Not found!"
     """
-    if text:
+    if user_id:
         if STORAGE_TYPE == "db":
-            del_obj = storage.get("State", escape(text))
+            del_obj = storage.get("User", escape(user_id))
         else:
             # Handles File Storage
             # storage.get return an object dictionary else None
-            del_obj = storage.get(State, escape(text))
+            del_obj = storage.get(User, escape(user_id))
         if del_obj:
             # storage.delete returns true on success else false
             del_status = storage.delete(del_obj)
@@ -120,27 +109,31 @@ def del_states(text):
             abort(404)
 
 
-@app_views.route('/states', strict_slashes=False, methods=['POST'])
-def post_states():
+@app_views.route('/users',
+                 strict_slashes=False, methods=['POST'])
+def post_users():
     """ Creates a new State and initializes it with a state name
     if requested dictionary is none output 'Not a JSON'
     if post data does not contain the key 'name' output 'Missing name'
     On success return a status of 201 else 400
     """
+
     req_json = request.get_json()
     if req_json is None:
         abort(400, 'Not a JSON')
-    if req_json.get("name") is None:
-        abort(400, 'Missing name')
-    new_object = State(**req_json)
+    if req_json.get("email") is None:
+        abort(400, 'Missing email')
+    if req_json.get("password") is None:
+        abort(400, 'Missing password')
+    new_object = User(**req_json)
     new_object.save()
     return jsonify(new_object.to_dict()), 201
 
 
-@app_views.route('/states/<string:state_id>',
+@app_views.route('/users/<user_id>',
                  strict_slashes=False, methods=['PUT'])
-def update_state(state_id):
-    """ Creates a new State and initializes it with a state name
+def update_user(user_id):
+    """ Updates a city's values
     if requested dictionary is none output 'Not a JSON'
     if post data does not contain the key 'name' output 'Missing name'
     On success return a status of 201 else 400
@@ -148,9 +141,8 @@ def update_state(state_id):
     req_json = request.get_json()
     if req_json is None:
         abort(400, 'Not a JSON')
-    if req_json.get("name") is None:
-        abort(400, 'Missing name')
-    status = storage.update(State, state_id, req_json)
+    ignore_fields = ['email']
+    status = storage.update(User, user_id, req_json, ignore_fields)
 
     if status:
         return jsonify(status.to_dict())

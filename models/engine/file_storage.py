@@ -168,19 +168,21 @@ class FileStorage:
         else:
             return len(FileStorage.__objects)
 
-    def update(self, obj, idd, req_json):
+    def update(self, obj, idd, req_json, ignore_fields=[]):
         """
         :param req_json: json dictionary
         :param idd:
         :param obj: updates
         :return:
         """
+        default_list_ignore = ["__class__", "created_at", "id", "updated_at"]
+        default_list_ignore += ignore_fields
         if obj:
 
             pkey = "{}.{}".format(obj.__name__, idd)
 
             for key, value in req_json.items():
-                if key not in ["__class__", "created_at", "id", "updated_at"]:
+                if key not in default_list_ignore:
                     try:
                         setattr(self.__class__.__objects[pkey], key, value)
                     except BaseException:
