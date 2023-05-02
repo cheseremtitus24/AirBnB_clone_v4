@@ -15,6 +15,7 @@ import api.v1.views
 from models import storage
 from models.state import State
 from models.city import City
+from flask_cors import CORS
 
 STORAGE_TYPE = os.environ.get('HBNB_TYPE_STORAGE')
 SERVE_HOST = os.environ.get('HBNB_API_HOST')
@@ -23,6 +24,7 @@ SERVE_PORT = os.environ.get('HBNB_API_PORT')
 os.environ["FLASK_APP"] = "app.py"
 
 app = Flask(__name__)
+CORS(app) # This will enable Cors for all routes
 
 """
  You can customize how the Flask Blueprint extends
