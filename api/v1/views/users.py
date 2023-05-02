@@ -63,7 +63,7 @@ def get_user(user_id):
 
     if True:
         if STORAGE_TYPE == "db":
-            user = storage.all("Users").values()
+            user = storage.all("User").values()
         else:
             user = storage.all(User).values()
 
@@ -137,6 +137,14 @@ def update_user(user_id):
     if requested dictionary is none output 'Not a JSON'
     if post data does not contain the key 'name' output 'Missing name'
     On success return a status of 201 else 400
+    TEST:
+ curl -X POST http://0.0.0.0:5000/api/v1/users -H
+  "Content-Type: application/json" -d
+  '{"email": "paris@main", "password": "parris"}'
+curl -X PUT http://0.0.0.0:5000/api/v1/users/
+3c7b8afe-b947-4c17-99cb-20b58ac67f05
+ -H "Content-Type: application/json" -d
+ '{"email": "paris@main", "password": "parrisdfsdfis"}'
     """
     req_json = request.get_json()
     if req_json is None:
