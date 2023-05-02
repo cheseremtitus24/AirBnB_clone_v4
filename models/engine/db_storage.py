@@ -84,6 +84,22 @@ class DBStorage:
                 obj_dict[obj_ref] = obj
             return obj_dict
 
+    def city_places(self, city_id):
+        """
+        cls is the state id to be searched for
+        returns a dictionary of all places within a City
+        """
+        obj_dict = {}
+        if city_id is not None:
+            a_query = self.__class__.__session.query(Place).join(
+                City, Place.city_id == City.id).filter(
+                City.id.in_(
+                    (city_id,)))
+            for obj in a_query:
+                obj_ref = "{}.{}".format(type(obj).__name__, obj.id)
+                obj_dict[obj_ref] = obj
+            return obj_dict
+
     def new(self, obj):
         """
             adds objects to current database session

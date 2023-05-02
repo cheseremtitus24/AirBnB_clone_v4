@@ -67,8 +67,6 @@ def get_user(user_id):
         else:
             user = storage.all(User).values()
 
-            # print(cities)
-
         for val in user:
             if val.id == user_id:
                 temp.append(val.to_dict())
