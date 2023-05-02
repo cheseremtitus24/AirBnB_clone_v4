@@ -76,7 +76,7 @@ def get_user(user_id):
         if len(temp) < 1:
             abort(404)
         else:
-            return jsonify(temp)
+            return jsonify(temp[0])
 
 
 @app_views.route('/users/<user_id>',
