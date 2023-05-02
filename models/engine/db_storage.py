@@ -174,7 +174,10 @@ class DBStorage:
         """
             returns the count of all objects in storage
         """
-        return (len(self.all(cls)))
+        if cls:
+            return len(self.all(cls))
+        else:
+            return len(self.all())
 
     def attributes(self):
         """Returns the valid attributes and their types for classname."""
