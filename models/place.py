@@ -41,7 +41,6 @@ class Place(BaseModel, Base):
         amenities = relationship(
             'Amenity',
             secondary="place_amenity",
-            overlaps='amenities,place_amenities',
             viewonly=False)
         reviews = relationship('Review', backref='place', cascade='delete')
     else:
