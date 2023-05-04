@@ -38,8 +38,11 @@ class Place(BaseModel, Base):
         latitude = Column(Float, nullable=True)
         longitude = Column(Float, nullable=True)
 
-        amenities = relationship('Amenity', secondary="place_amenity",
-                                 viewonly=False)
+        amenities = relationship(
+            'Amenity',
+            secondary="place_amenity",
+            overlaps='amenities,place_amenities',
+            viewonly=False)
         reviews = relationship('Review', backref='place', cascade='delete')
     else:
         city_id = ''
