@@ -24,7 +24,7 @@ SERVE_PORT = os.environ.get('HBNB_API_PORT')
 os.environ["FLASK_APP"] = "app.py"
 
 app = Flask(__name__)
-#CORS(app)  # This will enable Cors for all routes
+# CORS(app)  # This will enable Cors for all routes
 cors = CORS(app, resources={r"/*": {"origins": "0.0.0.0"}})
 
 """
