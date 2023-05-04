@@ -140,7 +140,7 @@ def post_city(state_id):
         # storage.get return an object dictionary else None
         state_obj = storage.get(State, escape(state_id))
     if state_obj is None:
-        abort(404, 'Not found')
+        abort(404)
 
     req_json = request.get_json()
     if req_json is None:
