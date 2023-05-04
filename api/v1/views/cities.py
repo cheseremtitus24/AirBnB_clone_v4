@@ -36,25 +36,36 @@ def get_cities(state_id):
     """
     temp = list()
 
-    if True:
-        if STORAGE_TYPE == "db":
-            cities = storage.state_cities(state_id).values()
-        else:
-            cities = storage.all(City).values()
-            dummy = list()
-
-            for value in cities:
-                # print(" --------", value)
-                if getattr(value, 'state_id', None) == state_id:
-                    dummy.append(value)
-            cities = dummy
-
-        for val in cities:
-            temp.append(val.to_dict())
-        if len(temp) < 1:
+    if STORAGE_TYPE == "db":
+        state = storage.get("State", escape(state_id))
+        if not state:
             abort(404)
-        else:
-            return jsonify(temp)
+        for city in state.cities:
+            list_cities.append(city.to_dict())
+
+        return jsonify(list_cities)
+    else:
+        # Handles File Storage
+        # storage.get return an object dictionary else None
+
+        # if STORAGE_TYPE == "db":
+        #    cities = storage.state_cities(state_id).values()
+        # else:
+        cities = storage.all(City).values()
+        dummy = list()
+
+        for value in cities:
+            # print(" --------", value)
+            if getattr(value, 'state_id', None) == state_id:
+                dummy.append(value)
+        cities = dummy
+
+    for val in cities:
+        temp.append(val.to_dict())
+    if len(temp) < 1:
+        abort(404)
+    else:
+        return jsonify(temp)
 
 
 @app_views.route('/cities', strict_slashes=False)
