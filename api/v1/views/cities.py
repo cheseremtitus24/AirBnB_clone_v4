@@ -15,7 +15,7 @@ app.register_blueprint(app_views, url_prefix="/diff/url")
 """
 import os
 
-from flask import jsonify, escape, abort, request
+from flask import jsonify, escape, abort, request, make_response
 
 from api.v1.views import app_views
 from models import storage, \
@@ -150,7 +150,7 @@ def post_city(state_id):
     req_json["state_id"] = state_id
     new_object = City(**req_json)
     new_object.save()
-    return jsonify(new_object.to_dict()), 201
+    return make_response(jsonify(new_object.to_dict()), 201)
 
 
 @app_views.route('/cities/<string:city_id>',
