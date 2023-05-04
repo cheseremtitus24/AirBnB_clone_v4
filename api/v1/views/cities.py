@@ -118,7 +118,7 @@ def del_city(city_id):
             # storage.delete returns true on success else false
             del_status = storage.delete(del_obj)
             if del_status:
-                return jsonify({})
+                return make_response(jsonify({}), 200)
             else:
                 abort(404)
         else:
