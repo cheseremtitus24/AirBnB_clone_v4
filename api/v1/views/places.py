@@ -15,7 +15,7 @@ app.register_blueprint(app_views, url_prefix="/diff/url")
 """
 import os
 
-from flask import jsonify, escape, abort, request
+from flask import jsonify, escape, abort, request, make_response
 
 from api.v1.views import app_views
 from models import storage, \
@@ -55,6 +55,7 @@ def get_places(city_id):
             abort(404)
         else:
             return jsonify(temp)
+
 
 # Very dangerous due to DOS - this is because
 # The server has to send alot of data to client
@@ -191,7 +192,15 @@ def post_places(city_id):
     req_json["user_id"] = user_id
     new_object = Place(**req_json)
     new_object.save()
-    return jsonify(new_object.to_dict()), 201
+    if STORAGE_TYPE == "db":
+        place_obj = storage.get("Place", escape(new_object.id))
+    else:
+        # Handles File Storage
+        # storage.get return an object dictionary else None
+        place_obj = storage.get(Place, escape(new_object.id))
+
+    return make_response(jsonify(place_obj.to_dict()), 201)
+    # return jsonify(new_object.to_dict()), 201
 
 
 @app_views.route('/places/<place_id>',

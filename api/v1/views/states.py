@@ -151,6 +151,7 @@ def update_state(state_id):
     if req_json.get("name") is None:
         abort(400, 'Missing name')
     status = storage.update(State, state_id, req_json)
+    storage.save()
 
     if status:
         return jsonify(status.to_dict())

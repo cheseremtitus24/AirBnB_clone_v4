@@ -15,7 +15,7 @@ app.register_blueprint(app_views, url_prefix="/diff/url")
 """
 import os
 
-from flask import jsonify, escape, abort, request
+from flask import jsonify, escape, abort, request, make_response
 
 from api.v1.views import app_views
 from models import storage, \
@@ -125,7 +125,15 @@ def post_users():
         abort(400, 'Missing password')
     new_object = User(**req_json)
     new_object.save()
-    return jsonify(new_object.to_dict()), 201
+    if STORAGE_TYPE == "db":
+        user_obj = storage.get("User", escape(new_object.id))
+    else:
+        # Handles File Storage
+        # storage.get return an object dictionary else None
+        user_obj = storage.get(User, escape(new_object.id))
+
+    return make_response(jsonify(user_obj.to_dict()), 201)
+    # return jsonify(new_object.to_dict()), 201
 
 
 @app_views.route('/users/<user_id>',

@@ -34,8 +34,22 @@ def get_cities(state_id):
     When a non_existent state_id is provided (url/states/<invalid_state_id>
     the page displays "Not found!"
     """
-    temp = list()
+    list_cities = list()
+    # temp = list()
+    if STORAGE_TYPE == "db":
+        state = storage.get("State", escape(state_id))
+    else:
+        # Handles File Storage
+        # storage.get return an object dictionary else None
+        state = storage.get(State, escape(state_id))
+    if not state:
+        abort(404)
+    for city in state.cities:
+        list_cities.append(city.to_dict())
 
+    return jsonify(list_cities)
+
+    """
     if True:
         if STORAGE_TYPE == "db":
             cities = storage.state_cities(state_id).values()
@@ -55,6 +69,7 @@ def get_cities(state_id):
             abort(404)
         else:
             return jsonify(temp)
+    """
 
 
 @app_views.route('/cities', strict_slashes=False)
@@ -150,7 +165,15 @@ def post_city(state_id):
     req_json["state_id"] = state_id
     new_object = City(**req_json)
     new_object.save()
-    return make_response(jsonify(new_object.to_dict()), 201)
+    if STORAGE_TYPE == "db":
+        city_obj = storage.get("City", escape(new_object.id))
+    else:
+        # Handles File Storage
+        # storage.get return an object dictionary else None
+        city_obj = storage.get(City, escape(new_object.id))
+
+    return make_response(jsonify(city_obj.to_dict()), 201)
+    # return make_response(jsonify(new_object.to_dict()), 201)
 
 
 @app_views.route('/cities/<string:city_id>',
@@ -169,6 +192,7 @@ def update_city(city_id):
     status = storage.update(City, city_id, req_json)
 
     if status:
+        storage.save()
         return jsonify(status.to_dict())
     else:
         abort(404)

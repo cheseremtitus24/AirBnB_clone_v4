@@ -15,7 +15,7 @@ app.register_blueprint(app_views, url_prefix="/diff/url")
 """
 import os
 
-from flask import jsonify, escape, abort, request
+from flask import jsonify, escape, abort, request, make_response
 
 from api.v1.views import app_views
 from models import storage, \
@@ -39,6 +39,8 @@ def get_reviews(place_id):
     if True:
         if STORAGE_TYPE == "db":
             reviews = storage.place_reviews(place_id).values()
+            # place = storage.get(Place, place_id)
+            # print(place.amenities)
         else:
             reviews = storage.all(Review).values()
             dummy = list()
@@ -155,15 +157,16 @@ def post_review(place_id):
     """
 
     if STORAGE_TYPE == "db":
-        review_obj = storage.get("Review", escape(place_id))
+        place_obj = storage.get("Place", escape(place_id))
     else:
         # Handles File Storage
         # storage.get return an object dictionary else None
-        review_obj = storage.get(Review, escape(place_id))
-    if review_obj is None:
+        place_obj = storage.get(Place, escape(place_id))
+    print("The place object is ", place_obj)
+    if place_obj is None:
         # If the city_id is not linked to any City object,
         # raise a 404 error
-        abort(404, 'Not found')
+        abort(404)
 
     req_json = request.get_json()
     if req_json is None:
@@ -175,8 +178,11 @@ def post_review(place_id):
         abort(400, 'Missing user_id')
     user_id = req_json.get('user_id')
     if STORAGE_TYPE == "db":
+        # You must have been at that place before in order to review.
+        # user_obj = storage.get("Place", user_id)
         user_obj = storage.get("User", user_id)
     else:
+        # user_obj = storage.get(Place, user_id)
         user_obj = storage.get(User, user_id)
 
     if user_obj is None:
@@ -188,7 +194,15 @@ def post_review(place_id):
     req_json["user_id"] = user_id
     new_object = Review(**req_json)
     new_object.save()
-    return jsonify(new_object.to_dict()), 201
+    if STORAGE_TYPE == "db":
+        review_obj = storage.get("Review", escape(new_object.id))
+    else:
+        # Handles File Storage
+        # storage.get return an object dictionary else None
+        review_obj = storage.get(Review, escape(new_object.id))
+
+    return make_response(jsonify(review_obj.to_dict()), 201)
+    # return jsonify(new_object.to_dict()), 201
 
 
 @app_views.route('/reviews/<review_id>',
@@ -203,7 +217,7 @@ def update_review(review_id):
     if req_json is None:
         abort(400, 'Not a JSON')
     ignore_fields = ['place_id', 'user_id']
-    status = storage.update(Place, review_id, req_json)
+    status = storage.update(Review, review_id, req_json)
 
     if status:
         return jsonify(status.to_dict())
