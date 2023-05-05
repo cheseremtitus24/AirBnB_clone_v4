@@ -172,8 +172,8 @@ def post_city(state_id):
         # storage.get return an object dictionary else None
         city_obj = storage.get(City, escape(new_object.id))
 
-    # return make_response(jsonify(city_obj.to_dict()), 201)
-    return make_response(jsonify(new_object.to_dict()), 201)
+    return make_response(jsonify(city_obj.to_dict()), 201)
+    #return make_response(jsonify(new_object.to_dict()), 201)
 
 
 @app_views.route('/cities/<string:city_id>',
