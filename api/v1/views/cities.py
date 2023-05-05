@@ -72,7 +72,7 @@ def get_cities(state_id):
     """
 
 
-# @app_views.route('/cities', strict_slashes=False)
+@app_views.route('/cities', strict_slashes=False)
 @app_views.route('/cities/<city_id>', strict_slashes=False)
 def get_city(city_id=None):
     """ Function returns list of cities by states and
