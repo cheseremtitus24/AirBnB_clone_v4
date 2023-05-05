@@ -56,7 +56,7 @@ class DBStorage:
         obj_dict = {}
         if cls is not None:
             try:
-                 a_query = self.__class__.__session.query(DBStorage.classes[cls])
+                a_query = self.__class__.__session.query(DBStorage.classes[cls])
             except:
                 return {}
             for obj in a_query:
