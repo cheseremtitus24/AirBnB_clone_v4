@@ -25,7 +25,8 @@ os.environ["FLASK_APP"] = "app.py"
 
 app = Flask(__name__)
 # CORS(app)  # This will enable Cors for all routes
-cors = CORS(app, resources={r"/*": {"origins": "0.0.0.0"}})
+# cors = CORS(app, resources={r"/*": {"origins": "0.0.0.0"}})
+cors = CORS(app, resources={r"/api/v1/*": {"origins": "*"}})
 
 """
  You can customize how the Flask Blueprint extends
