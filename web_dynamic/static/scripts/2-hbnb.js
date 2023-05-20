@@ -52,13 +52,13 @@ $(window).on('load', function () //executed only when DOM is loaded
                 {
                     type: 'GET',
                     dataType: 'json',
-                    url: 'http://0.0.0.0:5001/api/v1/status/',
+                    url: 'http://54.210.108.11/api/v1/status/',
                     success: function (results) {
                         if (results.status == "OK")
                         {
                             $('#api_status').css({'background-color':'#ff545f'});
                             selected.addClass('available');
-                            console.log("API endpoint is current active on port 0.0.0.0:5001/api/v1/status")
+                            console.log("API endpoint is current active on port 54.210.108.11/api/v1/status")
                             // selected.style('background-color')
                         }
                         else
@@ -75,7 +75,7 @@ $(window).on('load', function () //executed only when DOM is loaded
                         if (selected.hasClass('available'))
                             selected.removeClass('available');
                         $('#api_status').css({'background-color':'#cccccc'});
-                        console.error("API endpoint is offline on port 0.0.0.0:5001/api/v1/status")
+                        console.error("API endpoint is offline on port 54.210.108.11/api/v1/status")
                     }
                 });
         }
