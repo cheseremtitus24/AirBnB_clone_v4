@@ -144,3 +144,67 @@ $(window).on('load', function () //executed only when DOM is loaded
         }}
     );
 });
+
+// Filter by Amenities
+function filter_by_amenities(data)
+{
+    const places_section_item = $('.places');
+    $.ajax({
+        url: 'http://0.0.0.0:5001/api/v1/places_search/',
+        contentType: 'application/json',
+        dataType: 'json',
+        type: 'POST',
+        data: JSON.stringify(data),
+        success: function (response) {
+            try {
+                // Assuming the response is an array of dictionaries
+                $.each(response, async function (index, place) {
+                    let id = place.user_id; // Assuming 'id' is a key in the dictionary
+                    let url = 'http://0.0.0.0:5001/api/v1/users/' + id;
+
+                    // Create a new element to store the data
+
+                    // Make a GET request for each dictionary and wait for the response
+                    let place_user;
+                    places_section_item.empty();
+                    $.ajax(
+                        {
+                            type: 'GET',
+                            dataType: 'json',
+                            url: url,
+                            success: function (results) {
+                                place_user = results;
+                                places_section_item.append('<article>' +
+                                    ' <div class="title_box"> ' +
+                                    '<h2>' + place.name + '</h2> <div class="price_by_night">' + place.price_by_night + '</div>' +
+                                    ' </div> <div class="information"> <div class="max_guest">' + place.max_guest +
+                                    ` Guest${place.max_guest !== 1 ? 's' : ''}`+
+                                    '  </div>' +
+                                    ' <div class="number_rooms">' + place.number_rooms +
+                                    ` Bedroom${place.number_rooms !== 1 ? 's' : ''}`+
+                                    '  </div>' +
+                                    ' <div class="number_bathrooms">' + place.number_bathrooms +
+                                    ` Bathroom${place.number_bathrooms !== 1 ? 's' : ''}`+
+                                    '  </div>' +
+                                    ' </div> <div class="user"> <b>Owner:</b> ' + place_user.first_name + ' ' + place_user.last_name + ' </div> ' +
+                                    '<div class="description"> ' + place.description + ' </div> ' +
+                                    '</article>');
+                            }
+                        });
+                    // Handle the response for this dictionary
+
+                });
+            } catch (error) {
+                // Handle any errors that occurred during the POST request
+                console.error(error);
+            }
+        }
+        ,
+        error: function(){
+            alert("Error");
+        }}
+    );
+}
+
+const search_btn = $('SECTION.filter BUTTON');
+search_btn.on("click",function(){filter_by_amenities({'amenities':Object.keys(dictionary)})});
