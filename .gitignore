@@ -1,3 +1,9 @@
 .idea/**
 ./tests/__pycache__/**
 ./models/__pycache__/**
+./.venv
+./api/__pycache__/**
+./api/v1/__pycache__/**
+./api/v1/views/__pycache__/**
+./models/engine/__pycache__/**
+./tests/test_models/test_engine/__pycache__/**
