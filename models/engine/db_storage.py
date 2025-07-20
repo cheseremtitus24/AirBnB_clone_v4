@@ -6,6 +6,7 @@ Database engine
 import os
 from sqlalchemy import create_engine, MetaData, select
 from sqlalchemy.orm import sessionmaker, scoped_session
+from flask_migrate import Migrate
 from models.base_model import Base
 from models.user import User
 from models.place import Place
@@ -13,8 +14,9 @@ from models.state import State
 from models.city import City
 from models.amenity import Amenity
 from models.review import Review
+from models.image import Image
+from models.video import Video
 import datetime
-
 
 class DBStorage:
     """
@@ -24,6 +26,8 @@ class DBStorage:
         'Amenity': Amenity,
         'City': City,
         'Place': Place,
+        'Image': Image,
+        'Video': Video,
         'Review': Review,
         'State': State,
         'User': User
@@ -34,6 +38,9 @@ class DBStorage:
     """
     __engine = None
     __session = None
+    __metadata = None
+    metadata = None
+    engine = None
 
     def __init__(self):
         """
@@ -45,7 +52,9 @@ class DBStorage:
                 os.environ.get('HBNB_MYSQL_PWD'),
                 os.environ.get('HBNB_MYSQL_HOST'),
                 os.environ.get('HBNB_MYSQL_DB')), pool_pre_ping=True)
-
+        self.__class__.__metadata = Base.metadata
+        self.__class__.metadata = Base.metadata
+        self.__class__.engine = self.__class__.__engine
         if os.environ.get("HBNB_ENV") == 'tst':
             Base.metadata.drop_all(self.__class__.__engine)
 
@@ -114,6 +123,38 @@ class DBStorage:
                 Place, Place.id == Review.place_id).filter(
                 Place.id.in_(
                     (place_id,)))
+            for obj in a_query:
+                obj_ref = "{}.{}".format(type(obj).__name__, obj.id)
+                obj_dict[obj_ref] = obj
+            return obj_dict
+
+    def place_images(self, image_id):
+        """
+        cls is the state id to be searched for
+        returns a dictionary of all places within a City
+        """
+        obj_dict = {}
+        if image_id is not None:
+            a_query = self.__class__.__session.query(Image).join(
+                Place, Place.id == Image.place_id).filter(
+                Place.id.in_(
+                    (image_id,)))
+            for obj in a_query:
+                obj_ref = "{}.{}".format(type(obj).__name__, obj.id)
+                obj_dict[obj_ref] = obj
+            return obj_dict
+
+    def place_videos(self, video_id):
+        """
+        cls is the state id to be searched for
+        returns a dictionary of all places within a City
+        """
+        obj_dict = {}
+        if video_id is not None:
+            a_query = self.__class__.__session.query(Video).join(
+                Place, Place.id == Video.place_id).filter(
+                Place.id.in_(
+                    (video_id,)))
             for obj in a_query:
                 obj_ref = "{}.{}".format(type(obj).__name__, obj.id)
                 obj_dict[obj_ref] = obj
@@ -218,7 +259,15 @@ class DBStorage:
             "Review":
                 {"place_id": str,
                  "user_id": str,
-                 "text": str}
+                 "text": str},
+            "Image":
+                {"place_id": str,
+                 "user_id": str,
+                 "image_url": str},
+            "Video":
+                {"place_id": str,
+                 "user_id": str,
+                 "video_url": str}
         }
         return attributes
 
@@ -245,3 +294,14 @@ class DBStorage:
         else:
 
             return None
+
+    def get_engine(self):
+        """
+            commits all changes of current database session
+        """
+        return self.__class__.__engine
+    def get_metadata(self):
+        """
+            commits all changes of current database session
+        """
+        return self.__class__.__metadata

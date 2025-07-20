@@ -15,8 +15,8 @@ app.register_blueprint(app_views, url_prefix="/diff/url")
 """
 import os
 
-from flask import jsonify, escape, abort, request, make_response
-
+from flask import jsonify, abort, request, make_response
+from markupsafe import escape
 from api.v1.views import app_views
 from models import storage, \
     City, State, Amenity, Place, User
@@ -55,7 +55,8 @@ def get_places(city_id):
             abort(404)
         else:
             return jsonify(temp)
-
+    # return None
+#
 
 # Very dangerous due to DOS - this is because
 # The server has to send alot of data to client
@@ -96,6 +97,7 @@ def get_place(place_id=None):
                 return jsonify(temp[0])
             else:
                 return jsonify(temp)
+    # return None
 
 
 @app_views.route('/places/<place_id>',
@@ -126,6 +128,7 @@ def del_place(place_id):
                 abort(404)
         else:
             abort(404)
+    # return None
 
 
 @app_views.route('/cities/<city_id>/places',

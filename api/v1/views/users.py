@@ -15,8 +15,8 @@ app.register_blueprint(app_views, url_prefix="/diff/url")
 """
 import os
 
-from flask import jsonify, escape, abort, request, make_response
-
+from flask import jsonify, abort, request, make_response
+from markupsafe import escape
 from api.v1.views import app_views
 from models import storage, \
     User
@@ -144,9 +144,8 @@ def update_user(user_id):
     if post data does not contain the key 'name' output 'Missing name'
     On success return a status of 201 else 400
     TEST:
- curl -X POST http://0.0.0.0:5000/api/v1/users -H
-  "Content-Type: application/json" -d
-  '{"email": "paris@main", "password": "parris"}'
+ curl -X POST http://0.0.0.0:5000/api/v1/users -H  "Content-Type: application/json" -d  '{"email": "paris@main", "password": "parris"}'
+
 curl -X PUT http://0.0.0.0:5000/api/v1/users/
 3c7b8afe-b947-4c17-99cb-20b58ac67f05
  -H "Content-Type: application/json" -d

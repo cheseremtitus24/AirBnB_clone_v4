@@ -15,8 +15,8 @@ app.register_blueprint(app_views, url_prefix="/diff/url")
 """
 import os
 
-from flask import jsonify, escape, abort, request, make_response
-
+from flask import jsonify, abort, request, make_response
+from markupsafe import escape
 from api.v1.views import app_views
 from models import storage, \
     City, State, Amenity
@@ -47,6 +47,7 @@ def get_amenities():
             abort(404)
         else:
             return jsonify(temp)
+    # return None
 
 
 @app_views.route('/amenities/<amenity_id>', strict_slashes=False)
@@ -77,6 +78,7 @@ def get_amenity(amenity_id):
             abort(404)
         else:
             return jsonify(temp)
+    # return None
 
 
 @app_views.route('/amenities/<amenity_id>',

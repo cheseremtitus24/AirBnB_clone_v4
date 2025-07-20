@@ -19,13 +19,13 @@ from flask import jsonify, abort, request, make_response
 from markupsafe import escape
 from api.v1.views import app_views
 from models import storage, \
-    City, State, Amenity, Place, User, Review
+    City, State, Amenity, Place, User, Review, Image
 
 STORAGE_TYPE = os.environ.get('HBNB_TYPE_STORAGE')
 
 
-@app_views.route('/places/<place_id>/amenities', strict_slashes=False)
-def get_place_amenities(place_id):
+@app_views.route('/places/<place_id>/images', strict_slashes=False)
+def get_images(place_id):
     """ Function returns list of cities by states and
     displays/renders them in a html document.
     when no get parameter is provided it will list all available
@@ -34,60 +34,105 @@ def get_place_amenities(place_id):
     When a non_existent state_id is provided (url/states/<invalid_state_id>
     the page displays "Not found!"
     """
+    temp = list()
 
     if True:
         if STORAGE_TYPE == "db":
-            place = storage.get('Place', place_id)
-            if not place:
-                abort(404)
-            amenities = [amenity.to_dict() for amenity in place.amenities]
+            images = storage.place_images(place_id).values()
+            # place = storage.get(Place, place_id)
+            # print(place.amenities)
         else:
-            place = storage.get(Place, place_id)
-            if not place:
-                abort(404)
-            amenities = [storage.get(Amenity, amenity_id).to_dict()
-                         for amenity_id in place.amenity_ids]
-        return jsonify(amenities)
+            images = storage.all(Image).values()
+            dummy = list()
+
+            for value in images:
+                # print(" --------", value)
+                if getattr(value, 'place_id', None) == place_id:
+                    dummy.append(value)
+            images = dummy
+
+        for val in images:
+            temp.append(val.to_dict())
+        if len(temp) < 1:
+            abort(404)
+        else:
+            return jsonify(temp)
 
 
-@app_views.route('/places/<place_id>/amenities/<amenity_id>',
+@app_views.route('/images', strict_slashes=False)
+@app_views.route('/images/<image_id>', strict_slashes=False)
+def get_image(image_id=None):
+    """ Function returns list of cities by states and
+    displays/renders them in a html document.
+    when no get parameter is provided it will list all available
+    states.
+    When a state_id is provided it will list all cities within than state
+    When a non_existent state_id is provided (url/states/<invalid_state_id>
+    the page displays "Not found!"
+    """
+    temp = list()
+
+    if True:
+        if STORAGE_TYPE == "db":
+            image = storage.all("Image").values()
+        else:
+            image = storage.all(Image).values()
+
+            # print(cities)
+
+        for val in image:
+            if image_id is None:
+                temp.append(val.to_dict())
+            else:
+                if val.id == image_id:
+                    temp.append(val.to_dict())
+                    break
+        if len(temp) < 1:
+            abort(404)
+        else:
+            if image_id:
+                return jsonify(temp[0])
+            else:
+                return jsonify(temp)
+
+
+@app_views.route('/images/<image_id>',
                  strict_slashes=False,
                  methods=['DELETE'])
-def del_place_amenity(place_id, amenity_id):
+def del_image(image_id):
+    """ Function returns list of cities by states and
+    displays/renders them in a html document.
+    when no get parameter is provided it will list all available
+    states.
+    When a state_id is provided it will list all cities within than state
+    When a non_existent state_id is provided (url/states/<invalid_state_id>
+    the page displays "Not found!"
     """
-    Deletes an Amenity object of a Place
-    """
-    if STORAGE_TYPE == "db":
-        place = storage.get('Place', place_id)
-        if not place:
+    if image_id:
+        if STORAGE_TYPE == "db":
+            del_obj = storage.get("Image", escape(image_id))
+        else:
+            # Handles File Storage
+            # storage.get return an object dictionary else None
+            del_obj = storage.get(Image, escape(image_id))
+        if del_obj:
+            # storage.delete returns true on success else false
+            del_status = storage.delete(del_obj)
+            if del_status:
+                return jsonify({})
+            else:
+                abort(404)
+        else:
             abort(404)
-        amenity = storage.get('Amenity', amenity_id)
-        if not amenity:
-            abort(404)
-        if amenity not in place.amenities:
-            abort(404)
-        place.amenities.remove(amenity)
-    else:
-        # Handles File Storage
-        # storage.get return an object dictionary else None
-        place = storage.all(Place).values()
-        if not place:
-            abort(404)
-        amenity = storage.get(Amenity, amenity_id)
-        if not amenity:
-            abort(404)
-        if amenity_id not in place.amenity_ids:
-            abort(404)
-        place.amenity_ids.remove(amenity_id)
-    storage.save()
-    return make_response(jsonify({}), 200)
 
 
-@app_views.route('/places/<place_id>/amenities/<amenity_id>',
+@app_views.route('/places/<place_id>/images',
                  strict_slashes=False, methods=['POST'])
-def post_place_amenity(place_id, amenity_id):
-    """
-    Links an Amenity Object to a Place (many-2-many relationship)
+def post_image(place_id):
+    """ Creates a new Place within a City and initializes it with a state name
+    if requested dictionary is none output 'Not a JSON'
+    if post data does not contain the key 'name' output 'Missing name'
+    On success return a status of 201 else 400
     """
 
     """
@@ -112,34 +157,69 @@ def post_place_amenity(place_id, amenity_id):
     """
 
     if STORAGE_TYPE == "db":
-        place = storage.get("Place", escape(place_id))
-        if not place:
-            abort(404)
-
-        amenity = storage.get('Amenity', amenity_id)
-
-        if not amenity:
-            abort(404)
-        if amenity in place.amenities:
-            return make_response(jsonify(amenity.to_dict()), 200)
-        else:
-            place.amenities.append(amenity)
+        place_obj = storage.get("Place", escape(place_id))
     else:
         # Handles File Storage
         # storage.get return an object dictionary else None
-        place = storage.get(Place, escape(place_id))
-        if not place:
-            abort(404)
+        place_obj = storage.get(Place, escape(place_id))
+    print("The place object is ", place_obj)
+    if place_obj is None:
+        # If the city_id is not linked to any City object,
+        # raise a 404 error
+        abort(404)
 
-        amenity = storage.get(Amenity, amenity_id)
+    req_json = request.get_json()
+    if req_json is None:
+        abort(400, 'Not a JSON')
 
-        if not amenity:
-            abort(404)
-        if amenity_id in place.amenity_ids:
-            return make_response(jsonify(amenity.to_dict()), 200)
-        else:
-            place.amenity_ids.append(amenity_id)
+    if req_json.get("text") is None:
+        abort(400, 'Missing text')
+    if req_json.get("user_id") is None:
+        abort(400, 'Missing user_id')
+    user_id = req_json.get('user_id')
+    if STORAGE_TYPE == "db":
+        # You must have been at that place before in order to review.
+        # user_obj = storage.get("Place", user_id)
+        user_obj = storage.get("User", user_id)
+    else:
+        # user_obj = storage.get(Place, user_id)
+        user_obj = storage.get(User, user_id)
 
-    storage.save()
-    return make_response(jsonify(amenity.to_dict()), 201)
+    if user_obj is None:
+        # If the city_id is not linked to any City object,
+        # raise a 404 error
+        abort(404, 'Not found')
+
+    req_json["place_id"] = place_id
+    req_json["user_id"] = user_id
+    new_object = Image(**req_json)
+    new_object.save()
+    if STORAGE_TYPE == "db":
+        image_obj = storage.get("Image", escape(new_object.id))
+    else:
+        # Handles File Storage
+        # storage.get return an object dictionary else None
+        image_obj = storage.get(Review, escape(new_object.id))
+
+    return make_response(jsonify(image_obj.to_dict()), 201)
     # return jsonify(new_object.to_dict()), 201
+
+
+@app_views.route('/images/<image_id>',
+                 strict_slashes=False, methods=['PUT'])
+def update_image(image_id):
+    """ Updates a city's values
+    if requested dictionary is none output 'Not a JSON'
+    if post data does not contain the key 'name' output 'Missing name'
+    On success return a status of 201 else 400
+    """
+    req_json = request.get_json()
+    if req_json is None:
+        abort(400, 'Not a JSON')
+    ignore_fields = ['place_id', 'user_id']
+    status = storage.update(Review, image_id, req_json)
+
+    if status:
+        return jsonify(status.to_dict())
+    else:
+        abort(404)

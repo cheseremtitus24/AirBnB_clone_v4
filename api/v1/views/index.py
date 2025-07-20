@@ -16,7 +16,7 @@ import os
 
 from flask import jsonify, Blueprint
 
-from models import storage, Amenity, City, Review, State, User, Place
+from models import storage, Amenity, City, Review, State, User, Place, Image, Video
 
 app_views = Blueprint('app_views', __name__, url_prefix="/api/v1")
 STORAGE_TYPE = os.environ.get('HBNB_TYPE_STORAGE')
@@ -36,10 +36,10 @@ def stats():
     of model classes in storage
     """
     if STORAGE_TYPE == "db":
-        classes = ["Amenity", "City", "Place", "Review", "State", "User"]
+        classes = ["Amenity", "City", "Place", "Review","Image","Video", "State", "User"]
     else:
         classes = [Amenity, City, Place, Review, State, User]
-    names = ["amenities", "cities", "places", "reviews", "states", "users"]
+    names = ["amenities", "cities", "places", "reviews","images","videos", "states", "users"]
     num_objs = {}
     for i in range(len(classes)):
         num_objs[names[i]] = storage.count(classes[i])

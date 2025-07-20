@@ -15,8 +15,8 @@ app.register_blueprint(app_views, url_prefix="/diff/url")
 """
 import os
 
-from flask import jsonify, escape, abort, request
-
+from flask import jsonify, abort, request
+from markupsafe import escape
 from api.v1.views import app_views
 from models import storage, \
     State

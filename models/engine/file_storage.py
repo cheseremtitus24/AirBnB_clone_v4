@@ -53,11 +53,13 @@ class FileStorage:
         from models.city import City
         from models.amenity import Amenity
         from models.review import Review
+        from models.image import Image
+        from models.video import Video
 
         classes = {
             'BaseModel': BaseModel, 'User': User, 'Place': Place,
             'State': State, 'City': City, 'Amenity': Amenity,
-            'Review': Review
+            'Review': Review, 'Image': Image,'Video': Video
         }
         try:
             temp = {}
@@ -104,7 +106,15 @@ class FileStorage:
             "Review":
                 {"place_id": str,
                  "user_id": str,
-                 "text": str}
+                 "text": str},
+            "Image":
+                {"place_id": str,
+                 "user_id": str,
+                 "image_url": str},
+            "Video":
+                {"place_id": str,
+                 "user_id": str,
+                 "video_url": str}
         }
         return attributes
 
@@ -193,3 +203,8 @@ class FileStorage:
         else:
 
             return None
+    def get_engine(self):
+        """
+            commits all changes of current database session
+        """
+        return self.__class__.__file_path

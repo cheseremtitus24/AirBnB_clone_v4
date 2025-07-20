@@ -1,10 +1,12 @@
 #!/usr/bin/python3
 """ Place Module for HBNB project """
 import os
+from datetime import datetime
+
 from models.base_model import BaseModel, Base
 from sqlalchemy.orm import relationship
-from sqlalchemy import Column, Integer, String, Float, ForeignKey,\
-    MetaData, Table, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, \
+    MetaData, Table, ForeignKey, VARCHAR, DateTime
 from sqlalchemy.orm import backref
 STORAGE_TYPE = os.environ.get('HBNB_TYPE_STORAGE')
 
@@ -27,6 +29,11 @@ class Place(BaseModel, Base):
     """Place class handles all application places"""
     if STORAGE_TYPE == "db":
         __tablename__ = 'places'
+        id = Column(VARCHAR(60), nullable=False, primary_key=True)
+        created_at = Column(DateTime, nullable=False,
+                            default=datetime.utcnow())
+        updated_at = Column(DateTime, nullable=False,
+                            default=datetime.utcnow())
         city_id = Column(String(60), ForeignKey('cities.id'), nullable=False)
         user_id = Column(String(60), ForeignKey('users.id'), nullable=False)
         name = Column(String(128), nullable=False)
@@ -38,9 +45,16 @@ class Place(BaseModel, Base):
         latitude = Column(Float, nullable=True)
         longitude = Column(Float, nullable=True)
 
-        amenities = relationship('Amenity', secondary="place_amenity",
-                                 viewonly=False)
-        reviews = relationship('Review', backref='place', cascade='all, delete, delete-orphan')
+        # amenities = relationship('Amenity', secondary="place_amenity",
+                                 # viewonly=False)
+        amenities = relationship("Amenity",
+                                 secondary="place_amenity",
+                                 back_populates="places",
+                                 overlaps="place_amenities,amenities", viewonly=False)
+
+        reviews = relationship('Review', backref='places', cascade='all, delete, delete-orphan')
+        images = relationship('Image', backref='places', cascade='all, delete, delete-orphan')
+        videos = relationship('Video', backref='places', cascade='all, delete, delete-orphan')
     else:
         city_id = ''
         user_id = ''

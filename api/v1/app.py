@@ -5,16 +5,19 @@ html display and utilizes render_template
 which allows rendering of external reference html
 files
 """
-from flask import Flask, escape, make_response, render_template, jsonify
+from flask import Flask, make_response, render_template, jsonify
+from flask_migrate import Migrate
+from markupsafe import escape
 import os
 
 from api.v1.views import app_views
 # from api.v1.views import states
-# from api.v1.views import index
-import api.v1.views
+from api.v1.views import index
+# import api.v1.views
 from models import storage
 from models.state import State
 from models.city import City
+# from models.user import User
 from flask_cors import CORS
 
 STORAGE_TYPE = os.environ.get('HBNB_TYPE_STORAGE')
@@ -28,6 +31,7 @@ app = Flask(__name__)
 # cors = CORS(app, resources={r"/*": {"origins": "0.0.0.0"}})
 cors = CORS(app, resources={r"/api/v1/*": {"origins": "*"}})
 
+migrate = Migrate(app,storage.engine)
 """
  You can customize how the Flask Blueprint extends
   the application by providing some parameters to register_blueprint:
@@ -110,7 +114,6 @@ def get_states(text="all"):
                 states=states,
                 storage=storage,
                 city_decision=0)
-
 
 @app.route('/hbnb_filters', strict_slashes=False)
 def filters_list():
